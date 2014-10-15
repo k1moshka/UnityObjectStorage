@@ -8,14 +8,10 @@ using System;
 /// </summary>
 public class ObjectSchemeWindow : EditorWindow 
 {
-    [MenuItem("Assets/Create new object storage...")]
-    public static void ShowWindow()
-    {
-        EditorWindow.GetWindow(typeof(ObjectSchemeWindow));
-    }
-
     // рисование интерфейса
+     // TODO: imlement
     private string DataID = "";
+
     public void OnGUI()
     {
         GUILayout.BeginVertical();
@@ -23,5 +19,25 @@ public class ObjectSchemeWindow : EditorWindow
         DataID = EditorGUILayout.TextField("Data Id:", DataID);
         GUILayout.Label("Data fields");
         GUILayout.EndVertical();
+    }
+
+    [MenuItem("Assets/Create new object storage...")]
+    public static void ShowWindow()
+    {
+        EditorWindow.GetWindow(typeof(ObjectSchemeWindow));
+    }
+
+//------------- public interface
+    private DataScheme dataScheme;
+    public DataScheme DataScheme { get { return DataScheme; } }
+
+    public void LoadScheme(string schemeName)
+    {
+
+    }
+
+    public void SaveScheme()
+    {
+        // TODO: save at temp unity storage
     }
 }
