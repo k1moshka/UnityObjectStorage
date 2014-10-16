@@ -1,6 +1,12 @@
 ﻿using System;
 
-public class DataRegister
+namespace UnityStaticData
 {
+    /// <summary>
+    /// Промежуточный реестр данных
+    /// </summary>
+    public class DataRegister
+    {
 
+    }
 }

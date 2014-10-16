@@ -1,6 +1,11 @@
 ﻿using System;
-
-public static class ClassBuilder
+namespace UnityStaticData
 {
+    /// <summary>
+    /// Генератор сущностей для схем данных
+    /// </summary>
+    public static class ClassBuilder
+    {
 
+    }
 }
