@@ -20,6 +20,7 @@ project/*.user
 project/*.unityproj
 project/*.booproj
 project/Assets/DataLayer
+project/Assets/DataLayer.meta
 
 # ============ #
 # OS generated #
