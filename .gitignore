@@ -19,6 +19,7 @@ project/*.sln
 project/*.user
 project/*.unityproj
 project/*.booproj
+project/Assets/DataLayer
 
 # ============ #
 # OS generated #
