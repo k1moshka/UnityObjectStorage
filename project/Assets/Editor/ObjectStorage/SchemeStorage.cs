@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace UnityStaticData
 {
@@ -20,10 +21,18 @@ namespace UnityStaticData
         }
 
         private readonly static SchemeStorage _instance;
-
+        private static string PathForSaving { get { return Settings.GetPathToSaveData("schemesStorage.bin"); } }
+        
         static SchemeStorage()
         {
-            _instance = new SchemeStorage();
+            try
+            {
+                _instance = Serializator.LoadFrom<SchemeStorage>(PathForSaving);
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                _instance = new SchemeStorage();
+            }
         }
         /// <summary>
         /// Поучить схему по имени, если таковой нет, то создается новая с таким именем
@@ -41,9 +50,18 @@ namespace UnityStaticData
         /// </summary>
         /// <param name="schemeName"></param>
         /// <param name="scheme"></param>
-        public static void SaveScheme(string schemeName, DataScheme scheme)
+        public static void SaveScheme(DataScheme scheme)
         {
-            _instance.schemes[schemeName] = scheme;
+            _instance.schemes[scheme.TypeName] = scheme;
+        }
+        /// <summary>
+        /// Удаление схемы из хранилища
+        /// </summary>
+        /// <param name="schemeName">Название схемы</param>
+        public static void RemoveScheme(string schemeName)
+        {
+            if (_instance.schemes.ContainsKey(schemeName))
+                _instance.schemes.Remove(schemeName);
         }
         /// <summary>
         /// Сохранение всех схем в папке проекта
@@ -51,8 +69,16 @@ namespace UnityStaticData
         public static void SaveAtProject()
         {
             Serializator.SaveTo<SchemeStorage>(
-                Settings.GetPathToSaveData("schemesStorage.bin"), 
+                PathForSaving, 
                 _instance);
+        }
+        /// <summary>
+        /// Возвращает все имена зарегистрированных схем
+        /// </summary>
+        /// <returns></returns>
+        public static string[] GetAllRegisteredSchemes()
+        {
+            return _instance.schemes.Keys.ToArray();
         }
     }
 }
