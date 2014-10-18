@@ -5,13 +5,13 @@ namespace UnityStaticData
     /// <summary>
     /// Интерфейс описывающий генератор исходных кодов для классов данных
     /// </summary>
-    public interface IStaticDataGenerator
+    public interface IEntityGenerator
     {
         /// <summary>
-        /// Генерирование класса или структуры согласно схеме
+        /// Генерирование класса или структуры согласно схеме, возвращает c# код
         /// </summary>
         /// <param name="scheme">Схема данных</param>
         /// <param name="data">Данные для сохранения</param>
-        void GenerateStaticData(DataScheme scheme, object[] data);
+        string GenerateEntity(DataScheme scheme);
     }
 }
