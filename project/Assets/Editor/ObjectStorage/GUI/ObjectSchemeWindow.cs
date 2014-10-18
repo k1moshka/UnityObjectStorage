@@ -8,15 +8,19 @@ using UnityStaticData;
 /// <summary>
 /// Окно для создания схемы объекта, его полей и т.д.
 /// </summary>
-public class ObjectSchemeWindow : EditorWindow 
+public class ObjectSchemeWindow : EditorWindow
 {
-    private List<int> selectsType;
-    private string[] avaibleTypes = new string[] { "int", "string", "float", "double", "decimal", "Vector2", "Vector3", "Vector4", "Quaternion" };
+    private int selectedStorageType;
+    private int selectedDataType;
 
     private int fieldsCount; // количество полей в схеме
 
-    private List<string> fieldNames;
+    // fields types
+    private List<int> selectsType;
+    private string[] avaibleTypes = new string[] { "int", "string", "float", "double", "decimal", "Vector2", "Vector3", "Vector4", "Quaternion" };
 
+    //fields names
+    private List<string> fieldNames;
     private string[] allSchemeNames;
     private int selectedSchemeName;
 
@@ -39,6 +43,12 @@ public class ObjectSchemeWindow : EditorWindow
         }
 
         dataScheme.TypeName = EditorGUILayout.TextField("Scheme Name:", dataScheme.TypeName); // change scheme name
+
+        EditorGUILayout.BeginHorizontal();
+        dataScheme.StorageType =    (StorageType)EditorGUILayout.EnumPopup(dataScheme.StorageType);
+        dataScheme.DataType =       (DataType)EditorGUILayout.EnumPopup(dataScheme.DataType);
+        EditorGUILayout.EndHorizontal();
+
         GUILayout.Label("Data fields");
 
         if (GUILayout.Button("Add scheme field")) // button add fields to scheme
@@ -62,7 +72,6 @@ public class ObjectSchemeWindow : EditorWindow
         if (GUILayout.Button("Remove")) RemoveScheme(); // button remove current scheme
         GUILayout.EndHorizontal();
 
-        if (GUILayout.Button("Test button")) OnTest();
         GUILayout.EndVertical();
     }
 
@@ -178,12 +187,4 @@ public class ObjectSchemeWindow : EditorWindow
         }
     }
     #endregion
-
-    // on click button test
-    private void OnTest()
-    {
-        Debug.Log(
-            string.Format("lastSchemename:{0}", 
-            new object[] { lastSchemeName }));
-    }
 }
