@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Text.RegularExpressions;
 
 namespace UnityStaticData
 {
@@ -34,6 +34,32 @@ namespace UnityStaticData
         public DataScheme()
         {
             Fields = new Dictionary<string, string>();
+        }
+        /// <summary>
+        /// Валидация экземпляра
+        /// </summary>
+        /// <returns></returns>
+        public bool IsValid(out string errorMessage)
+        {
+            errorMessage = null;
+            var regex = new Regex(@"^\d|[\s,.:;'" + '"' + @"\[\]\(\)\*\&\^\$\#\!\~]");
+
+            if ((!string.IsNullOrEmpty(TypeName) && !regex.IsMatch(TypeName)) == false)
+            {
+                errorMessage = "Scheme name is invalid.";
+                return false;
+            }
+
+            foreach (var fieldName in Fields.Keys)
+            {
+                if (regex.IsMatch(fieldName))
+                {
+                    errorMessage = fieldName + " is invalid.";
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
