@@ -20,19 +20,12 @@ namespace UnityStaticData
             schemes = new Dictionary<string, DataScheme>();
         }
 
-        private readonly static SchemeStorage _instance;
+        private static SchemeStorage _instance;
         private static string PathForSaving { get { return Settings.GetPathToSaveData("schemesStorage.bin"); } }
         
         static SchemeStorage()
         {
-            try
-            {
-                _instance = Serializator.LoadFrom<SchemeStorage>(PathForSaving);
-            }
-            catch (System.IO.FileNotFoundException)
-            {
-                _instance = new SchemeStorage();
-            }
+            _instance = loadFromDisk();
         }
         /// <summary>
         /// Поучить схему по имени, если таковой нет, то создается новая с таким именем
@@ -61,7 +54,10 @@ namespace UnityStaticData
         public static void RemoveScheme(string schemeName)
         {
             if (_instance.schemes.ContainsKey(schemeName))
+            {
                 _instance.schemes.Remove(schemeName);
+                UnityEngine.Debug.Log(string.Format("{0} deleted", new object[] { schemeName }));
+            }
         }
         /// <summary>
         /// Сохранение всех схем в папке проекта
@@ -79,6 +75,28 @@ namespace UnityStaticData
         public static string[] GetAllRegisteredSchemes()
         {
             return _instance.schemes.Keys.ToArray();
+        }
+        /// <summary>
+        /// Обновление хранилища, синхранизация с текщей версией на диске
+        /// </summary>
+        public static void ReloadStorage()
+        {
+            _instance = loadFromDisk();
+        }
+        /// <summary>
+        /// Загрузка с диска текущей версии хранилища
+        /// </summary>
+        /// <returns></returns>
+        private static SchemeStorage loadFromDisk()
+        {
+            try
+            {
+                return Serializator.LoadFrom<SchemeStorage>(PathForSaving);
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                return new SchemeStorage();
+            }
         }
     }
 }
