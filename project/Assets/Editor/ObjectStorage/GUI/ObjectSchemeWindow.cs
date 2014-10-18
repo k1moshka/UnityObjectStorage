@@ -10,6 +10,8 @@ using UnityStaticData;
 /// </summary>
 public class ObjectSchemeWindow : EditorWindow
 {
+    private Vector2 scrollPos;
+
     private int selectedStorageType;
     private int selectedDataType;
 
@@ -27,6 +29,7 @@ public class ObjectSchemeWindow : EditorWindow
     // gui render
     public void OnGUI()
     {
+        scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
         GUILayout.BeginVertical();
         if (GUILayout.Button("Reload schemes")) ReloadStorage();
         GUILayout.Label(dataScheme.TypeName + " - change object scheme"); // header
@@ -72,13 +75,19 @@ public class ObjectSchemeWindow : EditorWindow
         if (GUILayout.Button("Remove")) RemoveScheme(); // button remove current scheme
         GUILayout.EndHorizontal();
 
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("Generate")) GenerateSource(); // button generate source
+        if (GUILayout.Button("Generate all")) GenerateAll();
+        GUILayout.EndHorizontal();
         GUILayout.EndVertical();
+        EditorGUILayout.EndScrollView();
     }
 
     [MenuItem("Assets/Create new object storage...")]
     public static void ShowWindow()
     {
-        EditorWindow.GetWindow(typeof(ObjectSchemeWindow));
+        var window = CreateInstance<ObjectSchemeWindow>();
+        window.Show();
     }
 
     #region window events
@@ -141,6 +150,19 @@ public class ObjectSchemeWindow : EditorWindow
     {
         SchemeStorage.ReloadStorage();
         initRegisteredSchemesCombo();
+    }
+
+    private void GenerateSource()
+    {
+        SourceGenerator.GenerateEntity(dataScheme);
+    }
+
+    private void GenerateAll()
+    {
+        foreach (var scheme in SchemeStorage.AllSchemes)
+        {
+            SourceGenerator.GenerateEntity(scheme);
+        }
     }
     #endregion
 
