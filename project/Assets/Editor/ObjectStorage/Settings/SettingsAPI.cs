@@ -7,10 +7,8 @@ namespace UnityStaticData
     /// Класс хранящий и управляющий настройками
     /// </summary>
     [Serializable]
-    public class Settings
+    public partial class Settings
     {
-        private const string DEFAULT_PATH = "Assets/DataLayer/";
-        private const string SETTING_PATH = "Assets/Editor/UnityStaticData/s.set";
         /// <summary>
         /// Экземпляр настроек
         /// </summary>
@@ -20,7 +18,7 @@ namespace UnityStaticData
             Instance = loadSettings();
             if (string.IsNullOrEmpty(Instance.PathToSaveData))
             {
-                Instance.PathToSaveData = DEFAULT_PATH;
+                Instance.InitDefaultValues();
             }
         }
         /// <summary>
@@ -33,16 +31,21 @@ namespace UnityStaticData
             return Instance.PathToSaveData + fileName;
         }
         /// <summary>
+        /// Получение валидного пути, на основе настроек для сохранения файла сурса
+        /// </summary>
+        /// <param name="fileName">Имя файла сгенерированного сурса</param>
+        /// <returns></returns>
+        public static string GetPathToSaveSources(string fileName)
+        {
+            return Instance.PathToSaveSources + "/" + fileName;
+        }
+        /// <summary>
         /// Сохранение настроек
         /// </summary>
         public static void Save()
         {
             Serializator.SaveTo<Settings>(SETTING_PATH, Instance);
         }
-        /// <summary>
-        /// Путь к папке сохранения данных
-        /// </summary>
-        public string PathToSaveData { get; set; }
 
         private static Settings loadSettings()
         {

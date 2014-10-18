@@ -52,7 +52,7 @@ namespace UnityStaticData
 
             foreach (var fieldName in Fields.Keys)
             {
-                if (regex.IsMatch(fieldName))
+                if (regex.IsMatch(fieldName) || fieldName == TypeName)
                 {
                     errorMessage = fieldName + " is invalid.";
                     return false;

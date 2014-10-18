@@ -22,6 +22,8 @@ namespace UnityStaticData
 
         private static SchemeStorage _instance;
         private static string PathForSaving { get { return Settings.GetPathToSaveData("schemesStorage.bin"); } }
+
+        public static DataScheme[] AllSchemes { get { return _instance.schemes.Values.ToArray(); } }
         
         static SchemeStorage()
         {
@@ -56,7 +58,6 @@ namespace UnityStaticData
             if (_instance.schemes.ContainsKey(schemeName))
             {
                 _instance.schemes.Remove(schemeName);
-                UnityEngine.Debug.Log(string.Format("{0} deleted", new object[] { schemeName }));
             }
         }
         /// <summary>
