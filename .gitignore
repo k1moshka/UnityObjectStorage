@@ -21,6 +21,8 @@ project/*.unityproj
 project/*.booproj
 project/Assets/DataLayer
 project/Assets/DataLayer.meta
+project/Assets/Scripts.meta
+project/Assets/Scripts
 
 # ============ #
 # OS generated #
