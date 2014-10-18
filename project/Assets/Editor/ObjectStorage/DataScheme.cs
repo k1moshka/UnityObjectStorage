@@ -42,7 +42,7 @@ namespace UnityStaticData
         public bool IsValid(out string errorMessage)
         {
             errorMessage = null;
-            var regex = new Regex(@"^\d|[\s,.:;'" + '"' + @"\[\]\(\)\*\&\^\$\#\!\~]");
+            var regex = new Regex(@"^\d|[\s,.:;'" + '"' + @"\[\]\(\)\*\&\^\$\#\!\~\<\>]");
 
             if ((!string.IsNullOrEmpty(TypeName) && !regex.IsMatch(TypeName)) == false)
             {
