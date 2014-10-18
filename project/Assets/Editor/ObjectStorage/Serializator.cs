@@ -121,7 +121,7 @@ namespace UnityStaticData
             public T Deserialize<T>(string path)
             {
                 T result;
-                using (var stream = File.OpenWrite(path))
+                using (var stream = File.OpenRead(path))
                 {
                     var formatter = new BinaryFormatter();
                     result = (T)formatter.Deserialize(stream);
@@ -148,7 +148,7 @@ namespace UnityStaticData
             public T Deserialize<T>(string path)
             {
                 T result;
-                using (var stream = File.OpenWrite(path))
+                using (var stream = File.OpenRead(path))
                 {
                     var formatter = new XmlSerializer(typeof(T));
                     result = (T)formatter.Deserialize(stream);
