@@ -200,8 +200,6 @@ public class ObjectSchemeWindow : EditorWindow
                 LoadScheme(tempList[0]);
             else
                 CreateScheme();
-
-            Debug.Log(string.Format("count:{0}; schemeName:{1}", new object[] { allSchemeNames.Length, dataScheme.TypeName }));
         }
         else if (lastCount != allSchemeNames.Length) // if added new scheme, else currentSelected dont change
         {

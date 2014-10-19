@@ -1,0 +1,45 @@
+//public class MatchInitializer
+//{
+//    public void Awake()
+//    {
+//        foreach (var t in Teams)
+//        {
+//            var teambar = createTeambar(t.Name, t.Players.Count);
+//            var barIndex = 0;
+
+//            foreach (var u in t.Players) // связь между сущностями - один (команда) ко многим (пользователь)
+//            {
+//                if (u.IsAuthorized) // использование полей определенных пользователем через гуи
+//                {
+//                    teambar.Playerbars[barIndex].Avatar = u.Avatar;     // использование заасайненого спрайта
+//                    teambar.Playerbars[barIndex].Nickname = u.Nickname; // использование изменяемого значения для поля, возможно только если сущности определены типом Runtime
+
+//                    teambar.Playerbars[barIndex].IsModerator = u.Role == Roles.Moderator;   // Использование в сущностях кастомных типов
+//                    teambar.Playerbars[barIndex].IsAdmin = u.Role == Roles.Admin;           // в данном случае enum
+//                }
+
+//                barIndex++;
+//            }
+//        }
+//    }
+//}
+
+//// другой пример статических данных
+//public class sample2
+//{
+//    /// <summary>
+//    /// Применение свойств айтема и изменение гуи
+//    /// </summary>
+//    /// <param name="item"></param>
+//    public void OnItemEquipment(Item item) // принимаем сущность
+//    {
+//        itembars[item.GetBarIndex()].Sprite = item.Icon;
+//        itembars[item.GetBarIndex()].BorderColor = item.Color;
+//        // GetBarIndex метод расширения
+
+//        if (item.Set != null)
+//        {
+//            setInfo.Text = 
+//        }
+//    }
+//}
