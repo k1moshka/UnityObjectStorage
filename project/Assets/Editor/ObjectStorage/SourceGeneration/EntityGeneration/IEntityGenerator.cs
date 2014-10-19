@@ -8,6 +8,10 @@ namespace UnityStaticData
     public interface IEntityGenerator
     {
         /// <summary>
+        /// Расширение файла сурса
+        /// </summary>
+        public string SourceExtension { get; }
+        /// <summary>
         /// Генерирование класса или структуры согласно схеме, возвращает c# код
         /// </summary>
         /// <param name="scheme">Схема данных</param>

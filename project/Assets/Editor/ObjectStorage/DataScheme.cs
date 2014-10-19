@@ -27,6 +27,11 @@ namespace UnityStaticData
         /// Название генерируемого типа для схемы
         /// </summary>
         public string TypeName { get; set; }
+        /// <summary>
+        /// Сгенерирована ли сущность для схемы
+        /// </summary>
+        [NonSerialized]
+        public bool IsGenerated { get { return System.IO.File.Exists(SourceGenerator.GetSourcePath(TypeName)); } }
 
         /// <summary>
         /// Создание нового экземпляра

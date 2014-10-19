@@ -38,5 +38,12 @@ namespace UnityStaticData
 
             return builder.ToString();
         }
+        /// <summary>
+        /// Расширение файла сурса
+        /// </summary>
+        public string SourceExtension
+        {
+            get { return "cs"; }
+        }
     }
 }
