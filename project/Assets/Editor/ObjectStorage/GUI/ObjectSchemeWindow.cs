@@ -19,7 +19,7 @@ public class ObjectSchemeWindow : EditorWindow
 
     // fields types
     private List<int> selectsType;
-    private string[] avaibleTypes = new string[] { "int", "string", "float", "double", "decimal", "Vector2", "Vector3", "Vector4", "Quaternion" };
+    private string[] availableTypes = Settings.GetRegisteredTypes();
 
     //fields names
     private List<string> fieldNames;
@@ -48,8 +48,8 @@ public class ObjectSchemeWindow : EditorWindow
         dataScheme.TypeName = EditorGUILayout.TextField("Scheme Name:", dataScheme.TypeName); // change scheme name
 
         EditorGUILayout.BeginHorizontal();
-        dataScheme.StorageType =    (StorageType)EditorGUILayout.EnumPopup(dataScheme.StorageType);
-        dataScheme.DataType =       (DataType)EditorGUILayout.EnumPopup(dataScheme.DataType);
+        dataScheme.StorageType = (StorageType)EditorGUILayout.EnumPopup(dataScheme.StorageType);
+        dataScheme.DataType = (DataType)EditorGUILayout.EnumPopup(dataScheme.DataType);
         EditorGUILayout.EndHorizontal();
 
         GUILayout.Label("Data fields");
@@ -64,7 +64,7 @@ public class ObjectSchemeWindow : EditorWindow
         {
             EditorGUILayout.Separator();
             fieldNames[i] = EditorGUILayout.TextField("Field Name:", fieldNames[i]);
-            selectsType[i] = EditorGUILayout.Popup("Field Type:", selectsType[i], avaibleTypes);
+            selectsType[i] = EditorGUILayout.Popup("Field Type:", selectsType[i], availableTypes);
         }
         EditorGUILayout.Separator();
         EditorGUILayout.Separator();
@@ -124,7 +124,7 @@ public class ObjectSchemeWindow : EditorWindow
         dataScheme.Fields.Clear();
         for (int i = 0; i < fieldNames.Count; i++)
         {
-            dataScheme.Fields[fieldNames[i]] = avaibleTypes[selectsType[i]];
+            dataScheme.Fields[fieldNames[i]] = Settings.GetDescriptor(availableTypes[selectsType[i]]);
         }
 
         string message;
@@ -180,7 +180,7 @@ public class ObjectSchemeWindow : EditorWindow
         selectsType = new List<int>();
         foreach (var t in dataScheme.Fields.Values)
         {
-            selectsType.Add(Array.IndexOf<string>(avaibleTypes, t));
+            selectsType.Add(Array.IndexOf<string>(availableTypes, t.ToString()));
         }
     }
 

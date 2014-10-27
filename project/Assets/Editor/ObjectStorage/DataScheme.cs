@@ -14,7 +14,7 @@ namespace UnityStaticData
         /// <summary>
         /// Все поля схемы, <имя поля, имя типа поля>
         /// </summary>
-        public Dictionary<string, string> Fields { get; set; }
+        public Dictionary<string, TypeDescriptor> Fields { get; set; }
         /// <summary>
         /// Тип генерируемых сущностей
         /// </summary>
@@ -30,7 +30,6 @@ namespace UnityStaticData
         /// <summary>
         /// Сгенерирована ли сущность для схемы
         /// </summary>
-        [NonSerialized]
         public bool IsGenerated { get { return System.IO.File.Exists(SourceGenerator.GetSourcePath(TypeName)); } }
 
         /// <summary>
@@ -38,7 +37,7 @@ namespace UnityStaticData
         /// </summary>
         public DataScheme()
         {
-            Fields = new Dictionary<string, string>();
+            Fields = new Dictionary<string, TypeDescriptor>();
         }
         /// <summary>
         /// Валидация экземпляра

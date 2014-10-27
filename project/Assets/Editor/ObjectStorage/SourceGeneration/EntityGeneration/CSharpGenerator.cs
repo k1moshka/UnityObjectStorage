@@ -20,6 +20,7 @@ namespace UnityStaticData
             builder.Remove(0, builder.Length); // clear builder
 
             builder.Append("using System;\n\npublic ");
+            builder.Append("[Serialzable]");
             builder.Append(scheme.DataType.ToString().ToLower());
             builder.Append(' ');
             builder.Append(scheme.TypeName);

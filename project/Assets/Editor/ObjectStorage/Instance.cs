@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace UnityStaticData
 {
@@ -16,33 +17,35 @@ namespace UnityStaticData
         /// <summary>
         /// Значение для полей экземпляра
         /// </summary>
-        public Dictionary<string, object> FieldsValues { get; set; }
-
-        private object schemeInstance;
+        public Dictionary<string, Field> FieldsValues { get; set; }
 
         public Instance()
         {
             // ctor for deserialization
         }
-
+        /// <summary>
+        /// Создание нового пустого экземпляра объекта
+        /// </summary>
+        /// <param name="scheme">Схема данных для инстанса</param>
         public Instance(DataScheme scheme)
         {
             DataScheme = scheme;
-            if (!DataScheme.IsGenerated)
-                SourceGenerator.GenerateEntity(DataScheme);
+            FieldsValues = new Dictionary<string, Field>();
 
-
-            var type = Type.GetType(DataScheme.TypeName);
-            schemeInstance = type.InvokeMember("", BindingFlags.CreateInstance, null, null, null);
             foreach (var f in DataScheme.Fields)
             {
-                var prop = type.GetProperty(f.Key); // получение свойства
-                var propType = prop.GetType();
-
-                if (!propType.IsPrimitive)
-                {
-                    prop.SetValue(schemeInstance, null, null); // set null if is primitive type
-                }
+                FieldsValues.Add(f.Key, new Field(f.Value));
+            }
+        }
+        /// <summary>
+        /// Отрисовка всех полей для экземпляра объекта схемы данных
+        /// </summary>
+        /// <returns></returns>
+        public void RenderFields()
+        {
+            foreach (var f in FieldsValues)
+            {
+                f.Value.RenderField(f.Key);
             }
         }
     }

@@ -10,7 +10,7 @@ namespace UnityStaticData
         /// <summary>
         /// Расширение файла сурса
         /// </summary>
-        public string SourceExtension { get; }
+        string SourceExtension { get; }
         /// <summary>
         /// Генерирование класса или структуры согласно схеме, возвращает c# код
         /// </summary>
