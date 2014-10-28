@@ -42,10 +42,11 @@ namespace UnityStaticData
                     new TypeDescriptor() { TypeName = "System.String",  RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderString" }, 
                     new TypeDescriptor() { TypeName = "System.Single", ToStringValue = "float", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderFloat" }, 
                     new TypeDescriptor() { TypeName = "System.Double",  RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderFloat" }, 
-                    new TypeDescriptor() { TypeName = "System.Decimal", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderFloat" }, 
+                    new TypeDescriptor() { TypeName = "System.Decimal", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderDecimal" }, 
                     new TypeDescriptor() { TypeName = "UnityEngine.Vector2", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderVector2" }, 
                     new TypeDescriptor() { TypeName = "UnityEngine.Vector3", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderVector3" }, 
                     new TypeDescriptor() { TypeName = "UnityEngine.Vector4", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderVector4" }, 
+                    new TypeDescriptor() { TypeName = "UnityEngine.Quaternion", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderQuaternion" }, 
                     new TypeDescriptor() { TypeName = "UnityEngine.Sprite", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderSprite" }, 
                     new TypeDescriptor() { TypeName = "UnityEngine.UnityObject", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderUnityObject" }, 
                 }

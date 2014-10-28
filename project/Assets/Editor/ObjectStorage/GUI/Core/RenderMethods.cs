@@ -91,5 +91,42 @@ namespace UnityStaticData
         {
             return EditorGUILayout.ObjectField(label, (UnityEngine.Object)value, typeof(UnityEngine.Object), false);
         }
+        /// <summary>
+        /// Отрисовка кватерниона
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static object RenderQuaternion(string label, object value)
+        {
+            var vector = (Vector4)EditorGUILayout.Vector4Field(label, QuaternionToVector4((Quaternion)value));
+            return new Quaternion(vector.x, vector.y, vector.z, vector.w);
+        }
+        /// <summary>
+        /// Отрисовка decimal
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static object RenderDecimal(string label, object value)
+        {
+            return (decimal)EditorGUILayout.FloatField(label, (float)value);
+        }
+        // TODO: ADVANCED: ADD DATETIME FIELD
+        /// <summary>
+        /// Отрисовка времени и даты
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static object RenderDateTime(string label, object value)
+        {
+            return null;
+        }
+
+        private static Vector4 QuaternionToVector4(Quaternion rot) 
+        {
+			return new Vector4(rot.x, rot.y, rot.z, rot.w);
+		}
     }
 }
