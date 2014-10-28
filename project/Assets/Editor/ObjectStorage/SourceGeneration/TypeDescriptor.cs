@@ -87,7 +87,6 @@ namespace UnityStaticData
             if (renderMethod != null)
                 return renderMethod(label, value);
             return null;
-            //throw new ArgumentNullException("Render method is null");
         }
 
         private void loadMethod()
@@ -96,7 +95,16 @@ namespace UnityStaticData
                 return;
 
             var type = System.Type.GetType(renderMethodType);
-            renderMethod = Delegate.CreateDelegate(typeof(RenderCustomField), type.GetMethod(RenderMethodName)) as RenderCustomField;
+
+            if (type == null)
+                throw new Exception("Type " + renderMethodType + " couldnt load from assembly");
+
+            var method = Delegate.CreateDelegate(typeof(RenderCustomField), type.GetMethod(RenderMethodName));
+
+            if (method == null)
+                throw new Exception("Render method couldnt load from assembly");
+
+            renderMethod = method as RenderCustomField;
         }
         #endregion
     }
