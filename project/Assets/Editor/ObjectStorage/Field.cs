@@ -29,10 +29,14 @@ namespace UnityStaticData
         {
             this.Type = typeDescr;
 
-            // TODO: разобраться с загрузкой типов из UnityEngine
-            Debug.Log(string.Format("typeName:{0}", new object[] { typeDescr.TypeName }));
             var type = this.Type.GetType();
-            
+
+            if (type == null)
+            {
+                var assembly = Assembly.GetAssembly(typeof(Vector2));
+                type = assembly.GetType(typeDescr.TypeName);
+            }
+
             if (type.IsClass)
                 Value = null;
             else
