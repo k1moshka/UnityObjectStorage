@@ -10,11 +10,12 @@ namespace UnityStaticData
     /// </summary>
     public partial class Settings
     {
+        private bool canWrite = false;
+
         private const string DEFAULT_PATH = "Assets/DataLayer/";
         private const string SETTING_PATH = "Assets/Editor/UnityStaticData/s.set";
         private const string SOURCES_PATH = "Assets/Scripts/Data";
 
-        // TODO: переделать set функции, что бы десериализация шла нормально, а установка была возможна только через методы
         /// <summary>
         /// Путь к папке сохранения данных
         /// </summary>
@@ -25,12 +26,12 @@ namespace UnityStaticData
         public string PathToSaveSources { get; set; }
 
         private List<TypeDescriptor> types = new List<TypeDescriptor>();
+        // Записывается только один раз на загрузке настроек, при дессериализации ли создании новых настроек
         /// <summary>
         /// Все зарегестрированные типы для полей
         /// </summary>
-        public TypeDescriptor[] AvailableTypes { get { return types.ToArray(); } set { types.Clear(); types.AddRange(value); } }
+        public TypeDescriptor[] AvailableTypes { get { return types.ToArray(); } set { if (canWrite) { types.Clear(); types.AddRange(value); canWrite = false; } } }
 
-        // TODO: сохранение настроек плагина для проекта
         private void InitDefaultValues()
         {
             PathToSaveData = DEFAULT_PATH;
@@ -48,7 +49,19 @@ namespace UnityStaticData
                     new TypeDescriptor() { TypeName = "UnityEngine.Sprite", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderSprite" }, 
                     new TypeDescriptor() { TypeName = "UnityEngine.UnityObject", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderUnityObject" }, 
                 }
-                );
+            );
         }
+
+        #region ctors
+        public Settings()
+        {
+
+        }
+
+        public Settings(bool manual)
+        {
+            InitDefaultValues();
+        }
+        #endregion
     }
 }

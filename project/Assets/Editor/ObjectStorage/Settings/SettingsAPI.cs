@@ -17,10 +17,6 @@ namespace UnityStaticData
         static Settings()
         {
             Instance = loadSettings();
-            if (string.IsNullOrEmpty(Instance.PathToSaveData))
-            {
-                Instance.InitDefaultValues();
-            }
         }
         /// <summary>
         /// Получение валидного пути, для сохранения в настроенной папке проэкта
@@ -87,7 +83,7 @@ namespace UnityStaticData
             }
             catch (FileNotFoundException)
             {
-                return new Settings();
+                return new Settings(false);
             }
         }
     }
