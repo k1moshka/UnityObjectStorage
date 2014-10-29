@@ -10,6 +10,11 @@ namespace UnityStaticData
     [Serializable]
     public class DataScheme
     {
+        /// <summary>
+        /// Происходит когда изменятеся одно из свойств схемы данных
+        /// </summary>
+        public event Action OnChanged;
+
         // <fieldName, typeName 
         /// <summary>
         /// Все поля схемы, <имя поля, имя типа поля>
@@ -40,6 +45,33 @@ namespace UnityStaticData
             Fields = new Dictionary<string, TypeDescriptor>();
         }
         /// <summary>
+        /// Добавление нового поля в схеиу данных
+        /// </summary>
+        /// <param name="name">Имя поля</param>
+        /// <param name="field">Описатель типа поля</param>
+        public void AddField(string name, TypeDescriptor field)
+        {
+            var needRaise = false;
+            if (!Fields.ContainsKey(name))
+                needRaise = true;
+
+            Fields[name] = field;
+
+            if (needRaise) raiseOnChanged();
+        }
+        /// <summary>
+        /// Удаление поля из схемы данных
+        /// </summary>
+        /// <param name="name">Имя поля</param>
+        public void RemoveField(string name)
+        {
+            if (Fields.ContainsKey(name))
+            {
+                Fields.Remove(name);
+                raiseOnChanged();
+            }
+        }
+        /// <summary>
         /// Валидация экземпляра
         /// </summary>
         /// <returns></returns>
@@ -64,6 +96,12 @@ namespace UnityStaticData
             }
 
             return true;
+        }
+
+        private void raiseOnChanged()
+        {
+            if (OnChanged != null)
+                OnChanged();
         }
     }
 }

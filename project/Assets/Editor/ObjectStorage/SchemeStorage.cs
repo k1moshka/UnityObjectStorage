@@ -23,6 +23,11 @@ namespace UnityStaticData
         private static SchemeStorage _instance;
         private static string PathForSaving { get { return Settings.GetPathToSaveData("schemesStorage.bin"); } }
 
+        /// <summary>
+        /// Происходит когда добавляется или удаляется схема данных.
+        /// </summary>
+        public static event Action OnSchemesChanged;
+
         public static DataScheme[] AllSchemes { get { return _instance.schemes.Values.ToArray(); } }
         
         static SchemeStorage()
@@ -47,7 +52,14 @@ namespace UnityStaticData
         /// <param name="scheme"></param>
         public static void SaveScheme(DataScheme scheme)
         {
+            var needRaise = false;
+            if (!_instance.schemes.ContainsKey(scheme.TypeName))
+                needRaise = true;
+
             _instance.schemes[scheme.TypeName] = scheme;
+
+            if (needRaise)
+                raiseOnSchemesChanged();
         }
         /// <summary>
         /// Удаление схемы из хранилища
@@ -58,6 +70,8 @@ namespace UnityStaticData
             if (_instance.schemes.ContainsKey(schemeName))
             {
                 _instance.schemes.Remove(schemeName);
+
+                raiseOnSchemesChanged();
             }
         }
         /// <summary>
@@ -98,6 +112,12 @@ namespace UnityStaticData
             {
                 return new SchemeStorage();
             }
+        }
+
+        private static void raiseOnSchemesChanged()
+        {
+            if (OnSchemesChanged != null)
+                OnSchemesChanged();
         }
     }
 }
