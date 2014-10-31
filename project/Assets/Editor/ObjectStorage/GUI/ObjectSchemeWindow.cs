@@ -22,7 +22,12 @@ public class ObjectSchemeWindow : EditorWindow
     private string[] availableTypes = Settings.GetRegisteredTypes();
 
     //fields names
+    // нужно показывать имена и тип полей для каждой схемы
+    // имена показываются текстбоксами и редактируются ими же
+    // поля показываются комбобоксами и редактируются
+
     private List<string> fieldNames;
+    // комобобокс о всеми созданными схемами
     private string[] allSchemeNames;
     private int selectedSchemeName;
 
@@ -60,11 +65,19 @@ public class ObjectSchemeWindow : EditorWindow
             fieldNames.Add(string.Empty);
             selectsType.Add(0);
         }
+        
         for (int i = 0; i < fieldsCount; i++) // begin fields of scheme
         {
             EditorGUILayout.Separator();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginVertical();
             fieldNames[i] = EditorGUILayout.TextField("Field Name:", fieldNames[i]);
             selectsType[i] = EditorGUILayout.Popup("Field Type:", selectsType[i], availableTypes);
+            EditorGUILayout.EndVertical();
+
+            if (GUILayout.Button("Remove")) RemoveField(i);
+            EditorGUILayout.EndHorizontal();
         }
         EditorGUILayout.Separator();
         EditorGUILayout.Separator();
@@ -124,7 +137,7 @@ public class ObjectSchemeWindow : EditorWindow
         dataScheme.Fields.Clear();
         for (int i = 0; i < fieldNames.Count; i++)
         {
-            dataScheme.Fields[fieldNames[i]] = Settings.GetDescriptor(availableTypes[selectsType[i]]);
+            dataScheme.AddField(fieldNames[i], Settings.GetDescriptor(availableTypes[selectsType[i]]));
         }
 
         string message;
@@ -144,6 +157,13 @@ public class ObjectSchemeWindow : EditorWindow
         SchemeStorage.SaveAtProject();
 
         initRegisteredSchemesCombo(false);
+    }
+
+    private void RemoveField(int index)
+    {
+        fieldsCount--;
+        fieldNames.RemoveAt(index);
+        selectsType.RemoveAt(index);
     }
 
     private void ReloadStorage()
