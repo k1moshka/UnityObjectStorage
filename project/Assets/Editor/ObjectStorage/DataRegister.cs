@@ -15,10 +15,14 @@ namespace UnityStaticData
 
         static DataRegister()
         {
-            instances = Serializator.LoadFrom<Dictionary<string, Instance[]>>(Settings.GetPathToSaveData(FILENAME));
-
-            if (instances == null)
+            try
+            {
+                instances = Serializator.LoadFrom<Dictionary<string, Instance[]>>(Settings.GetPathToSaveData(FILENAME));
+            }
+            catch (System.IO.FileNotFoundException)
+            {
                 instances = new Dictionary<string, Instance[]>();
+            }                
         }        
         /// <summary>
         /// Сохранение всех инстансов для всех схем в папке проекта на диске.
