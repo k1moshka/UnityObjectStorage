@@ -29,10 +29,10 @@ public class DataStorageVisualizatorWindow : EditorWindow
         var newIndex = EditorGUILayout.Popup(schemeIndex, allSchemes); // combobox all dataschemes
         if (newIndex != schemeIndex)
         {
+            schemeIndex = newIndex;
+
             loadScheme();
             loadInstances();
-
-            schemeIndex = newIndex;
         }
         EditorGUILayout.Separator();
 
