@@ -9,6 +9,8 @@ namespace UnityStaticData
     /// </summary>
     public static class RenderMethods
     {
+        // TODO: написать гуи для полей decimal, quaternion, даты, времени
+
         /// <summary>
         /// Отрисовка целочисленного поля
         /// </summary>

@@ -8,7 +8,6 @@ namespace UnityStaticData
     /// <summary>
     /// Представление экземпляра сущности для схемы данных, необходимый для генерации репозитория или ресурсов
     /// </summary>
-    [Serializable]
     public class Instance
     {
         /// <summary>

@@ -15,15 +15,10 @@ namespace UnityStaticData
 
         static DataRegister()
         {
-            try
-            {
-                instances = Serializator.LoadFrom<Dictionary<string, Instance[]>>(Settings.GetPathToSaveData(FILENAME));
-            }
-            catch (System.IO.FileNotFoundException)
-            {
-                if (instances == null)
-                    instances = new Dictionary<string, Instance[]>();
-            }
+            instances = Serializator.LoadFrom<Dictionary<string, Instance[]>>(Settings.GetPathToSaveData(FILENAME));
+
+            if (instances == null)
+                instances = new Dictionary<string, Instance[]>();
         }        
         /// <summary>
         /// Сохранение всех инстансов для всех схем в папке проекта на диске.
@@ -41,10 +36,7 @@ namespace UnityStaticData
         /// <returns></returns>
         public static Instance[] GetInstances(string dataSchemeName)
         {
-            if (instances.ContainsKey(dataSchemeName))
-                return instances[dataSchemeName];
-
-            return instances[dataSchemeName] = new Instance[0];
+            return instances[dataSchemeName];
         }
         /// <summary>
         /// Сохранение инстансов для схемы данных
@@ -54,7 +46,6 @@ namespace UnityStaticData
         public static void SaveInstances(string dataSchemeName, Instance[] instancesToSave)
         {
             instances[dataSchemeName] = instancesToSave;
-            Save();
         }
     }
 }
