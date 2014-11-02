@@ -19,8 +19,9 @@ namespace UnityStaticData
         {
             builder.Remove(0, builder.Length); // clear builder
 
-            builder.Append("using System;\n\npublic ");
-            builder.Append("[Serialzable]");
+            builder.Append("using System;\n\n");
+            builder.Append("[Serializable]\n");
+            builder.Append("public ");
             builder.Append(scheme.DataType.ToString().ToLower());
             builder.Append(' ');
             builder.Append(scheme.TypeName);
@@ -29,7 +30,7 @@ namespace UnityStaticData
             foreach (var kv in scheme.Fields) // render properties
             {
                 builder.Append("    public ");
-                builder.Append(kv.Value);
+                builder.Append(kv.Value.TypeName); 
                 builder.Append(" ");
                 builder.Append(kv.Key);
                 builder.Append(" { get; set; }\n");
