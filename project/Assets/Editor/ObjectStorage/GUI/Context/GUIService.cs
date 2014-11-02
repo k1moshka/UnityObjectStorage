@@ -2,7 +2,8 @@
 
 namespace UnityStaticData
 {
-    public class GUIService
+    public static class GUIService
     {
+        
     }
 }

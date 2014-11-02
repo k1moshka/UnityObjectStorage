@@ -23,16 +23,16 @@ public class DataStorageVisualizatorWindow : EditorWindow
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
         EditorGUILayout.BeginVertical();
 
-        if (GUILayout.Button("Reload data layer")) Reload();        // button reload instances for scheme
+        if (GUILayout.Button("Reload data layer")) Reload();            // button reload instances for scheme
         EditorGUILayout.Separator();
 
         var newIndex = EditorGUILayout.Popup(schemeIndex, allSchemes); // combobox all dataschemes
         if (newIndex != schemeIndex)
         {
+            schemeIndex = newIndex;
+
             loadScheme();
             loadInstances();
-
-            schemeIndex = newIndex;
         }
         EditorGUILayout.Separator();
 
@@ -116,7 +116,5 @@ public class DataStorageVisualizatorWindow : EditorWindow
             instances.AddRange(DataRegister.GetInstances(dataScheme.TypeName));
         }
     }
-
-
     #endregion
 }

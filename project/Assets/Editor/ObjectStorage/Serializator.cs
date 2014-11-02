@@ -5,6 +5,8 @@ using System.Xml.Serialization;
 
 namespace UnityStaticData
 {
+    // TODO: JSON сериализатор
+    // TODO: сериализация н сериализуемых объектов
     /// <summary>
     /// Сериализатор объектов, который сам знает в каком формате нужно сохранить объект
     /// </summary>
