@@ -10,6 +10,7 @@ using System.Collections.Generic;
 /// </summary>
 public class DataStorageVisualizatorWindow : EditorWindow
 {
+    // TODO: дописать интерфейс окна
     [MenuItem("Assets/Manage Storage...")]
     [ContextMenu("Manage Storage...")]
     public static void ShowWindow()
@@ -142,7 +143,7 @@ public class DataStorageVisualizatorWindow : EditorWindow
 //////////////////////////////////////////////////////////////////////////////////////////////
     #region event handlers
     // добавление или удаление схем из контекста
-    private void SchemeStorage_OnSchemesChanged()
+    private void SchemeStorage_OnSchemesChanged(SchemeStorage.SchemeChangedEventArgs args)
     {
         fillSchemesCombobox();
 

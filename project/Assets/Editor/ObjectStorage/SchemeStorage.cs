@@ -24,10 +24,10 @@ namespace UnityStaticData
         private static string PathForSaving { get { return Settings.GetPathToSaveData("schemesStorage.bin"); } }
 
         /// <summary>
-        /// Происходит когда добавляется или удаляется схема данных.
+        /// Происходит когда добавляется или удаляется схема данных. Передает имя схемы
         /// </summary>
         [field: NonSerialized]
-        public static event Action OnSchemesChanged; 
+        public static event Action<SchemeChangedEventArgs> OnSchemesChanged; 
 
         public static DataScheme[] AllSchemes { get { return _instance.schemes.Values.ToArray(); } }
         
@@ -56,7 +56,7 @@ namespace UnityStaticData
             var key = KeyGenerator.GenerateStringKey();
             _instance.schemes[key] = scheme;
 
-            raiseSchemesChanged();
+            raiseSchemesChanged(scheme.TypeName, true);
 
             return key;
         }
@@ -82,7 +82,7 @@ namespace UnityStaticData
                 _instance.schemes[schemeName].CleanUpHandlers();
                 _instance.schemes.Remove(schemeName);
 
-                raiseSchemesChanged();
+                raiseSchemesChanged(schemeName, false);
             }
         }
         /// <summary>
@@ -126,10 +126,22 @@ namespace UnityStaticData
             }
         }
 
-        private static void raiseSchemesChanged()
+        private static void raiseSchemesChanged(string schemeName, bool isAdding)
         {
             if (OnSchemesChanged != null)
-                OnSchemesChanged();
+                OnSchemesChanged(new SchemeChangedEventArgs() { SchemeName = schemeName, IsAdding = isAdding });
+        }
+
+        public class SchemeChangedEventArgs
+        {
+            /// <summary>
+            /// Имя схемы, которая была добавлена или удалена
+            /// </summary>
+            public string SchemeName    { get; set; }
+            /// <summary>
+            /// Показывает была ли добавлена схема. true - добавлена, false - удалена
+            /// </summary>
+            public bool IsAdding        { get; set; }
         }
     }
 }
