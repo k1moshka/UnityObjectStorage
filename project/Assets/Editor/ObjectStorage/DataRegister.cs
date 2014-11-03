@@ -9,7 +9,7 @@ namespace UnityStaticData
     public static class DataRegister
     {
         private const string FILENAME = "inst.bin";
-
+        // TODO: переделать на генерированные ключи связзаные с ключами из SchemeStorage
         // <dataSchemeName, instances of datascheme>
         private static Dictionary<string, Instance[]> instances;
 
@@ -29,7 +29,9 @@ namespace UnityStaticData
                 // отсоеденение производлится автоматически при удалении схемы из репозитория схем SchemeStorage
                 SchemeStorage.GetScheme(s).OnFieldsChanged += SyncSchemeInstances;
             }
-        }  
+
+            SchemeStorage.OnSchemesChanged += SchemeStorage_OnSchemesChanged;
+        }
         /// <summary>
         /// Инициализация реестра данных
         /// </summary>
@@ -53,10 +55,12 @@ namespace UnityStaticData
         /// <returns></returns>
         public static Instance[] GetInstances(string dataSchemeName)
         {
-            if (!DataRegister.instances.ContainsKey(dataSchemeName))
-                instances[dataSchemeName] = new Instance[0];
+            var refferenceKey = SchemeStorage.GetSchemeKey(dataSchemeName);
 
-            return instances[dataSchemeName];
+            if (!DataRegister.instances.ContainsKey(refferenceKey))
+                instances[refferenceKey] = new Instance[0];
+
+            return instances[refferenceKey];
         }
         /// <summary>
         /// Сохранение инстансов для схемы данных
@@ -65,14 +69,21 @@ namespace UnityStaticData
         /// <param name="instancesToSave">Инстансы для сохранения</param>
         public static void SaveInstances(string dataSchemeName, Instance[] instancesToSave)
         {
-            instances[dataSchemeName] = instancesToSave;
-        }
+            var refferenceKey = SchemeStorage.GetSchemeKey(dataSchemeName);
 
+            instances[refferenceKey] = instancesToSave;
+        }
+        /// <summary>
+        /// Удаление инстансов для схемы данных
+        /// </summary>
+        /// <param name="dataSchemeName">Имя схемы</param>
         public static void RemoveInstances(string dataSchemeName)
         {
-            if (instances.ContainsKey(dataSchemeName))
+            var refferenceKey = SchemeStorage.GetSchemeKey(dataSchemeName);
+
+            if (instances.ContainsKey(refferenceKey))
             {
-                instances.Remove(dataSchemeName);
+                instances.Remove(refferenceKey);
             }
         }
         /// <summary>
@@ -81,10 +92,24 @@ namespace UnityStaticData
         /// <param name="schemeName">Имя схемы для которой нужно провести валидацию</param>
         public static void SyncSchemeInstances(string schemeName)
         {
-            foreach (var instance in instances[schemeName])
+            foreach (var instance in GetInstances(schemeName))
             {
                 instance.SyncWithScheme();
             }
+
+            Save();
         }
+
+        private static void SchemeStorage_OnSchemesChanged(SchemeStorage.SchemeChangedEventArgs args)
+        {
+            if (args.IsAdding)
+            {
+                SchemeStorage.GetScheme(args.SchemeName).OnFieldsChanged += SyncSchemeInstances;
+            }
+            else
+            {
+                RemoveInstances(args.SchemeName);
+            }
+        }  
     }
 }

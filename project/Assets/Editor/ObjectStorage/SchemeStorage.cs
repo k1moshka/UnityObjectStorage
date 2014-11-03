@@ -47,6 +47,17 @@ namespace UnityStaticData
                     select s).FirstOrDefault();
         }
         /// <summary>
+        /// Получение ключа для схемы по ее имени
+        /// </summary>
+        /// <param name="schemeName">Имя схемы</param>
+        /// <returns></returns>
+        public static string GetSchemeKey(string schemeName)
+        {
+            return (from s in _instance.schemes
+                    where s.Value.TypeName == schemeName
+                    select s.Key).FirstOrDefault();
+        }
+        /// <summary>
         /// Сохранение новой схемы в реестре схем
         /// </summary>
         /// <param name="scheme">Новая схема</param>
