@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -11,15 +12,21 @@ namespace UnityStaticData
     public class DataScheme
     {
         /// <summary>
-        /// Происходит когда изменятеся одно из свойств схемы данных
+        /// Происходит когда изменятся одно из свойств схемы данных. Передается имя схемы
         /// </summary>
-        public event Action OnChanged;
-
-        // <fieldName, typeName 
+        [field: NonSerialized]
+        public event Action<string> OnFieldsChanged;
         /// <summary>
-        /// Все поля схемы, <имя поля, имя типа поля>
+        /// Происходит когда схема данных переименовывается. Передается (старое название, новое название)
         /// </summary>
-        public Dictionary<string, TypeDescriptor> Fields { get; set; }
+        [field: NonSerialized]
+        public event Action<string, string> OnRenameScheme;
+
+        // <fieldKey, field>
+        /// <summary>
+        /// Все поля схемы, (fieldKey, field)
+        /// </summary>
+        public Dictionary<string, Field> Fields { get; set; }
         /// <summary>
         /// Тип генерируемых сущностей
         /// </summary>
@@ -28,10 +35,12 @@ namespace UnityStaticData
         /// Место хранения данных схемы
         /// </summary>
         public StorageType StorageType { get; set; }
+
+        private string typeName;
         /// <summary>
         /// Название генерируемого типа для схемы
         /// </summary>
-        public string TypeName { get; set; }
+        public string TypeName { get { return typeName; } set { var lastName = typeName; typeName = value; if (lastName != value) raiseRename(lastName); } }
         /// <summary>
         /// Сгенерирована ли сущность для схемы
         /// </summary>
@@ -42,34 +51,45 @@ namespace UnityStaticData
         /// </summary>
         public DataScheme()
         {
-            Fields = new Dictionary<string, TypeDescriptor>();
+            Fields = new Dictionary<string, Field>();
         }
         /// <summary>
-        /// Добавление нового поля в схеиу данных
+        /// Добавление нового поля в схему данных. Возвращает ключ для нового поля.
         /// </summary>
         /// <param name="name">Имя поля</param>
         /// <param name="field">Описатель типа поля</param>
-        public void AddField(string name, TypeDescriptor field)
+        public string AddField(Field field)
         {
-            var needRaise = false;
-            if (!Fields.ContainsKey(name))
-                needRaise = true;
+            var key = KeyGenerator.GenerateStringKey();
 
-            Fields[name] = field;
+            Fields[key] = field;
 
-            if (needRaise) raiseOnChanged();
+            RaiseChanged();
+
+            return key;
         }
         /// <summary>
         /// Удаление поля из схемы данных
         /// </summary>
         /// <param name="name">Имя поля</param>
-        public void RemoveField(string name)
+        public void RemoveField(string fieldKey)
         {
-            if (Fields.ContainsKey(name))
+            if (Fields.ContainsKey(fieldKey))
             {
-                Fields.Remove(name);
-                raiseOnChanged();
+                Fields.Remove(fieldKey);
+                RaiseChanged();
             }
+        }
+        /// <summary>
+        /// Удаление поля из схемы по имени поля
+        /// </summary>
+        /// <param name="fieldName">Имя поля в схеме данных</param>
+        public void RemoveFieldByName(string fieldName)
+        {
+            var removingField = Fields.FirstOrDefault(f => f.Value.Name == fieldName);
+
+            if (removingField.Value != null && removingField.Key != null)
+                Fields.Remove(removingField.Key);
         }
         /// <summary>
         /// Валидация экземпляра
@@ -86,22 +106,37 @@ namespace UnityStaticData
                 return false;
             }
 
-            foreach (var fieldName in Fields.Keys)
+            foreach (var field in Fields.Values)
             {
-                if (regex.IsMatch(fieldName) || fieldName == TypeName)
+                if (regex.IsMatch(field.Name) || field.Name == TypeName)
                 {
-                    errorMessage = fieldName + " is invalid.";
+                    errorMessage = "Field " + field + " is invalid.";
                     return false;
                 }
             }
 
             return true;
         }
-
-        private void raiseOnChanged()
+        /// <summary>
+        /// Очистка всех обрабочиков событий для схемы
+        /// </summary>
+        public void CleanUpHandlers()
         {
-            if (OnChanged != null)
-                OnChanged();
+            OnFieldsChanged = null;
         }
+
+        #region event raisers
+        public void RaiseChanged()
+        {
+            if (OnFieldsChanged != null)
+                OnFieldsChanged(TypeName);
+        }
+
+        private void raiseRename(string lastName)
+        {
+            if (OnRenameScheme != null)
+                OnRenameScheme(lastName, typeName);
+        }
+        #endregion
     }
 }

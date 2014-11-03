@@ -30,7 +30,7 @@ namespace UnityStaticData
             foreach (var kv in scheme.Fields) // render properties
             {
                 builder.Append("    public ");
-                builder.Append(kv.Value.TypeName); 
+                builder.Append(kv.Value.Type.TypeName); 
                 builder.Append(" ");
                 builder.Append(kv.Key);
                 builder.Append(" { get; set; }\n");

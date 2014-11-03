@@ -22,8 +22,21 @@ namespace UnityStaticData
             catch (System.IO.FileNotFoundException)
             {
                 instances = new Dictionary<string, Instance[]>();
-            }                
-        }        
+            }
+
+            foreach (var s in SchemeStorage.GetAllRegisteredSchemes())
+            {
+                // отсоеденение производлится автоматически при удалении схемы из репозитория схем SchemeStorage
+                SchemeStorage.GetScheme(s).OnFieldsChanged += SyncSchemeInstances;
+            }
+        }  
+        /// <summary>
+        /// Инициализация реестра данных
+        /// </summary>
+        public static void Prepare()
+        {
+            // используется для того что бы вызвать статический конструктор
+        }
         /// <summary>
         /// Сохранение всех инстансов для всех схем в папке проекта на диске.
         /// </summary>
@@ -40,6 +53,9 @@ namespace UnityStaticData
         /// <returns></returns>
         public static Instance[] GetInstances(string dataSchemeName)
         {
+            if (!DataRegister.instances.ContainsKey(dataSchemeName))
+                instances[dataSchemeName] = new Instance[0];
+
             return instances[dataSchemeName];
         }
         /// <summary>
@@ -50,6 +66,25 @@ namespace UnityStaticData
         public static void SaveInstances(string dataSchemeName, Instance[] instancesToSave)
         {
             instances[dataSchemeName] = instancesToSave;
+        }
+
+        public static void RemoveInstances(string dataSchemeName)
+        {
+            if (instances.ContainsKey(dataSchemeName))
+            {
+                instances.Remove(dataSchemeName);
+            }
+        }
+        /// <summary>
+        /// Приведение всех инстансов к текущему состоянию связанной схемы
+        /// </summary>
+        /// <param name="schemeName">Имя схемы для которой нужно провести валидацию</param>
+        public static void SyncSchemeInstances(string schemeName)
+        {
+            foreach (var instance in instances[schemeName])
+            {
+                instance.SyncWithScheme();
+            }
         }
     }
 }

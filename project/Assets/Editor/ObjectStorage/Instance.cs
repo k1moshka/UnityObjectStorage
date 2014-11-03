@@ -35,7 +35,7 @@ namespace UnityStaticData
 
             foreach (var f in DataScheme.Fields)
             {
-                FieldsValues.Add(f.Key, new Field(f.Value));
+                FieldsValues.Add(f.Key, new Field(f.Value.Type) { Name = f.Value.Name });
             }
         }
         /// <summary>
@@ -44,10 +44,52 @@ namespace UnityStaticData
         /// <returns></returns>
         public void RenderFields()
         {
+            if (FieldsValues != null)
             foreach (var f in FieldsValues)
             {
-                f.Value.RenderField(f.Key);
+                if (f.Value != null)
+                    f.Value.RenderField();
             }
         }
+        /// <summary>
+        /// Синхронизация полей со схемой данных
+        /// </summary>
+        public void SyncWithScheme()
+        {
+            DataScheme = SchemeStorage.GetScheme(DataScheme.TypeName);
+
+            helpList.Clear();
+            foreach (var f in FieldsValues)
+            {
+                if (!DataScheme.Fields.ContainsKey(f.Key))
+                {
+                    helpList.Add(f.Key); // add field for delete
+                }
+            }
+
+            // delete all marked fields
+            foreach (var d in helpList)
+            {
+                FieldsValues.Remove(d);
+            }
+            helpList.Clear();
+
+            // add new fields and rename containing fields
+            foreach (var f in DataScheme.Fields)
+            {
+                if (!FieldsValues.ContainsKey(f.Key))
+                {
+                    FieldsValues.Add(f.Key, new Field(f.Value.Type) { Name = f.Value.Name });
+                }
+                else
+                {
+                    FieldsValues[f.Key].Name = f.Value.Name;
+                }
+            }
+        }
+
+        #region helpers
+        private readonly static List<string> helpList = new List<string>();
+        #endregion
     }
 }

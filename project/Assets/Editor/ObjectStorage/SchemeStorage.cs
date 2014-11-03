@@ -26,7 +26,8 @@ namespace UnityStaticData
         /// <summary>
         /// Происходит когда добавляется или удаляется схема данных.
         /// </summary>
-        public static event Action OnSchemesChanged;
+        [field: NonSerialized]
+        public static event Action OnSchemesChanged; 
 
         public static DataScheme[] AllSchemes { get { return _instance.schemes.Values.ToArray(); } }
         
@@ -41,25 +42,34 @@ namespace UnityStaticData
         /// <returns></returns>
         public static DataScheme GetScheme(string schemeName)
         {
-            if (!_instance.schemes.ContainsKey(schemeName) || _instance.schemes[schemeName] == null)
-                _instance.schemes[schemeName] = new DataScheme();
-            return _instance.schemes[schemeName];
+            return (from s in _instance.schemes.Values
+                    where s.TypeName == schemeName
+                    select s).FirstOrDefault();
         }
         /// <summary>
-        /// Сохранение схемы, в объекте
+        /// Сохранение новой схемы в реестре схем
         /// </summary>
-        /// <param name="schemeName"></param>
-        /// <param name="scheme"></param>
-        public static void SaveScheme(DataScheme scheme)
+        /// <param name="scheme">Новая схема</param>
+        /// <returns></returns>
+        public static string AddScheme(DataScheme scheme)
         {
-            var needRaise = false;
-            if (!_instance.schemes.ContainsKey(scheme.TypeName))
-                needRaise = true;
+            var key = KeyGenerator.GenerateStringKey();
+            _instance.schemes[key] = scheme;
 
-            _instance.schemes[scheme.TypeName] = scheme;
+            raiseSchemesChanged();
 
-            if (needRaise)
-                raiseOnSchemesChanged();
+            return key;
+        }
+        /// <summary>
+        /// Проверяет есть ли схема с указанным именем в реестре
+        /// </summary>
+        /// <param name="schemeName">Проверяемое имя схемы</param>
+        /// <returns></returns>
+        public static bool HasScheme(string schemeName)
+        {
+            return (from s in AllSchemes
+                    where s.TypeName == schemeName
+                    select s).Count() > 0;
         }
         /// <summary>
         /// Удаление схемы из хранилища
@@ -69,9 +79,10 @@ namespace UnityStaticData
         {
             if (_instance.schemes.ContainsKey(schemeName))
             {
+                _instance.schemes[schemeName].CleanUpHandlers();
                 _instance.schemes.Remove(schemeName);
 
-                raiseOnSchemesChanged();
+                raiseSchemesChanged();
             }
         }
         /// <summary>
@@ -89,7 +100,8 @@ namespace UnityStaticData
         /// <returns></returns>
         public static string[] GetAllRegisteredSchemes()
         {
-            return _instance.schemes.Keys.ToArray();
+            return (from name in _instance.schemes.Values
+                    select name.TypeName).ToArray();
         }
         /// <summary>
         /// Обновление хранилища, синхранизация с текщей версией на диске
@@ -114,7 +126,7 @@ namespace UnityStaticData
             }
         }
 
-        private static void raiseOnSchemesChanged()
+        private static void raiseSchemesChanged()
         {
             if (OnSchemesChanged != null)
                 OnSchemesChanged();

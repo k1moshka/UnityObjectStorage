@@ -10,6 +10,9 @@ namespace UnityStaticData
     /// </summary>
     public static class Serializator
     {
+        // TODO: JSON сериализация
+        // TODO: сериализация для несериализуемых объектов
+
         /// <summary>
         /// Формат сохранения объектов
         /// </summary>

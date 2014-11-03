@@ -1,6 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using System;
+using System.Linq;
 using UnityStaticData;
 using System.Collections.Generic;
 
@@ -18,8 +19,6 @@ public class DataStorageVisualizatorWindow : EditorWindow
 
     public void OnGUI()
     {
-        // TODO: реализовать синхронизацию с schemeobjectwindow через контекст GUI
-
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
         EditorGUILayout.BeginVertical();
 
@@ -60,6 +59,8 @@ public class DataStorageVisualizatorWindow : EditorWindow
     #region main workflow
     public void Reload()
     {
+        SchemeStorage.OnSchemesChanged -= SchemeStorage_OnSchemesChanged;
+
         Awake();
     }
 
@@ -85,6 +86,17 @@ public class DataStorageVisualizatorWindow : EditorWindow
     {
         fillSchemesCombobox();
         loadScheme();
+        loadInstances();
+
+        SchemeStorage.OnSchemesChanged += SchemeStorage_OnSchemesChanged;
+    }
+
+    public void OnDestroy()
+    {
+        dataScheme.OnFieldsChanged -= dataScheme_OnChanged;
+        SchemeStorage.OnSchemesChanged -= SchemeStorage_OnSchemesChanged;
+
+        DataRegister.Save();
     }
     #endregion
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,8 +114,18 @@ public class DataStorageVisualizatorWindow : EditorWindow
     private DataScheme dataScheme;
     private void loadScheme()
     {
+        if (dataScheme != null)
+        {
+            dataScheme.OnFieldsChanged -= dataScheme_OnChanged;
+            dataScheme.OnRenameScheme -= dataScheme_OnRenameScheme;
+        }
+
         if (allSchemes.Length > 0)
+        {
             dataScheme = SchemeStorage.GetScheme(allSchemes[schemeIndex]);
+            dataScheme.OnFieldsChanged += dataScheme_OnChanged;
+            dataScheme.OnRenameScheme += dataScheme_OnRenameScheme;
+        }
     }
 
     private List<Instance> instances = new List<Instance>();
@@ -116,7 +138,37 @@ public class DataStorageVisualizatorWindow : EditorWindow
             instances.AddRange(DataRegister.GetInstances(dataScheme.TypeName));
         }
     }
+    #endregion
+//////////////////////////////////////////////////////////////////////////////////////////////
+    #region event handlers
+    // добавление или удаление схем из контекста
+    private void SchemeStorage_OnSchemesChanged()
+    {
+        fillSchemesCombobox();
 
+        if (!allSchemes.Contains(dataScheme.TypeName))
+        {
+            dataScheme.CleanUpHandlers();
+            DataRegister.RemoveInstances(dataScheme.TypeName);
+            DataRegister.Save();
 
+            schemeIndex = 0;
+
+            loadScheme();
+            loadInstances();
+        }
+    }
+
+    // детект изменения текущей схемы
+    private void dataScheme_OnChanged(string schemeName)
+    {
+        loadScheme();
+        loadInstances(); 
+    }
+
+    private void dataScheme_OnRenameScheme(string lastName, string newName)
+    {
+        fillSchemesCombobox();
+    }
     #endregion
 }

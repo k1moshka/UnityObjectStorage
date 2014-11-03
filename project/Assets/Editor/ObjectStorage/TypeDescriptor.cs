@@ -76,7 +76,6 @@ namespace UnityStaticData
                 loadMethod();
             }
         }
-
         /// <summary>
         /// Отрисовка поля
         /// </summary>

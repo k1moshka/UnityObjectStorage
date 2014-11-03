@@ -9,8 +9,6 @@ namespace UnityStaticData
     /// </summary>
     public static class RenderMethods
     {
-        // TODO: написать гуи для полей decimal, quaternion, даты, времени
-
         /// <summary>
         /// Отрисовка целочисленного поля
         /// </summary>
@@ -110,7 +108,7 @@ namespace UnityStaticData
         /// <returns></returns>
         public static object RenderDecimal(string label, object value)
         {
-            return (decimal)EditorGUILayout.FloatField(label, (float)value);
+            return Convert.ToDecimal(EditorGUILayout.FloatField(label, Convert.ToSingle((decimal)value)));
         }
         // TODO: ADVANCED: ADD DATETIME FIELD
         /// <summary>

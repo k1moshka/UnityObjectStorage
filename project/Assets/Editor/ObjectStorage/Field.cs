@@ -11,6 +11,10 @@ namespace UnityStaticData
     public class Field
     {
         /// <summary>
+        /// Имя поля в схеме данных
+        /// </summary>
+        public string Name { get; set; }
+        /// <summary>
         /// Значение поля
         /// </summary>
         public object Value { get; set; }
@@ -48,9 +52,9 @@ namespace UnityStaticData
         /// </summary>
         /// <param name="value">Текущее значение поля</param>
         /// <returns></returns>
-        public object RenderField(string fieldName)
+        public object RenderField()
         {
-            return Value = Type.RenderField(fieldName, Value);
+            return Value = Type.RenderField(Name, Value);
         }
     }
 }

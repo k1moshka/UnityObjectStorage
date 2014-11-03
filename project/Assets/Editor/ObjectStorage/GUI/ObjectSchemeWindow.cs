@@ -20,16 +20,16 @@ public class ObjectSchemeWindow : EditorWindow
     // fields types
     private List<int> selectsType;
     private string[] availableTypes = Settings.GetRegisteredTypes();
-
-    //fields names
-    // нужно показывать имена и тип полей для каждой схемы
-    // имена показываются текстбоксами и редактируются ими же
-    // поля показываются комбобоксами и редактируются
-
-    private List<string> fieldNames;
+    // field names
+    private List<string> fieldKeys;
     // комобобокс о всеми созданными схемами
     private string[] allSchemeNames;
     private int selectedSchemeName;
+
+    // имя схемы данных
+    private string schemeName;
+    // последнее правильное имя схемы
+    private string lastValidSchemeName;
 
     // gui render
     public void OnGUI()
@@ -50,7 +50,7 @@ public class ObjectSchemeWindow : EditorWindow
                 LoadScheme(allSchemeNames[selectedSchemeName]);
         }
 
-        dataScheme.TypeName = EditorGUILayout.TextField("Scheme Name:", dataScheme.TypeName); // change scheme name
+        schemeName = EditorGUILayout.TextField("Scheme Name:", schemeName); // change scheme name
 
         EditorGUILayout.BeginHorizontal();
         dataScheme.StorageType = (StorageType)EditorGUILayout.EnumPopup(dataScheme.StorageType);
@@ -62,23 +62,35 @@ public class ObjectSchemeWindow : EditorWindow
         if (GUILayout.Button("Add scheme field")) // button add fields to scheme
         {
             fieldsCount++;
-            fieldNames.Add(string.Empty);
             selectsType.Add(0);
+
+            var key = dataScheme.AddField(new Field() { Type = Settings.GetDescriptor(availableTypes[0]) });
+            fieldKeys.Add(key);
         }
-        
-        for (int i = 0; i < fieldsCount; i++) // begin fields of scheme
+        // TOOO: ренейм полей
+        for (int i = 0; i < fieldsCount; i++) // begin fields render
         {
             EditorGUILayout.Separator();
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.BeginVertical();
-            fieldNames[i] = EditorGUILayout.TextField("Field Name:", fieldNames[i]);
+
+            var field = dataScheme.Fields[fieldKeys[i]];
+
+            // handle rename field
+            field.Name = EditorGUILayout.TextField("Field Name:", field.Name);
+
+            // handle change type of field
+            var lastSelectedType = selectsType[i];
             selectsType[i] = EditorGUILayout.Popup("Field Type:", selectsType[i], availableTypes);
+            if (lastSelectedType != selectsType[i])
+                field.Type = Settings.GetDescriptor(availableTypes[selectsType[i]]);
+
             EditorGUILayout.EndVertical();
 
             if (GUILayout.Button("Remove")) RemoveField(i);
             EditorGUILayout.EndHorizontal();
-        }
+        }                                       // end field render
         EditorGUILayout.Separator();
         EditorGUILayout.Separator();
         EditorGUILayout.Separator();
@@ -106,19 +118,21 @@ public class ObjectSchemeWindow : EditorWindow
     #region window events
     public void Awake()
     {
+        DataRegister.Prepare();
         initRegisteredSchemesCombo();
+
+        schemeName = dataScheme.TypeName;
     }
     #endregion
 
     //------------- public interface
     #region main workflow
     private DataScheme dataScheme;
-    public DataScheme DataScheme { get { return DataScheme; } }
 
     private void LoadScheme(string schemeName)
     {
         dataScheme = SchemeStorage.GetScheme(schemeName);
-        lastSchemeName = dataScheme.TypeName;
+        schemeName = lastValidSchemeName = dataScheme.TypeName;
 
         initFields();
     }
@@ -129,23 +143,26 @@ public class ObjectSchemeWindow : EditorWindow
 
         initFields();
 
-        lastSchemeName = dataScheme.TypeName = "<define scheme name>";
+        schemeName = dataScheme.TypeName = "<define scheme name>";
     }
 
     private void SaveScheme()
     {
-        dataScheme.Fields.Clear();
-        for (int i = 0; i < fieldNames.Count; i++)
-        {
-            dataScheme.AddField(fieldNames[i], Settings.GetDescriptor(availableTypes[selectsType[i]]));
-        }
+        dataScheme.TypeName = schemeName;
 
         string message;
         if (!dataScheme.IsValid(out message))
+        {
+            schemeName = dataScheme.TypeName = lastValidSchemeName;
             throw new Exception("Not valid data scheme: " + message);
+        }
 
-        if (nameChanged) SchemeStorage.RemoveScheme(lastSchemeName); // remove scheme if schemename changed because scheme not replace but scheme add as new scheme
-        SchemeStorage.SaveScheme(dataScheme);
+        lastValidSchemeName = dataScheme.TypeName;
+        dataScheme.RaiseChanged();
+
+        if (!SchemeStorage.HasScheme(dataScheme.TypeName))
+            SchemeStorage.AddScheme(dataScheme);
+
         SchemeStorage.SaveAtProject();
 
         initRegisteredSchemesCombo(false);
@@ -156,13 +173,15 @@ public class ObjectSchemeWindow : EditorWindow
         SchemeStorage.RemoveScheme(dataScheme.TypeName);
         SchemeStorage.SaveAtProject();
 
-        initRegisteredSchemesCombo(false);
+        initRegisteredSchemesCombo(true);
     }
 
     private void RemoveField(int index)
     {
+        dataScheme.RemoveField(fieldKeys[index]);
+
         fieldsCount--;
-        fieldNames.RemoveAt(index);
+        fieldKeys.RemoveAt(index);
         selectsType.RemoveAt(index);
     }
 
@@ -187,20 +206,18 @@ public class ObjectSchemeWindow : EditorWindow
     #endregion
 
     #region gui helpers
-    private string lastSchemeName; // имя схемы при загрузки
-    private bool nameChanged { get { return lastSchemeName != dataScheme.TypeName && lastSchemeName != null; } }
 
     // инициализация интерфейса для полей схемы
     private void initFields()
     {
         fieldsCount = dataScheme.Fields.Count;
 
-        fieldNames = new List<string>(dataScheme.Fields.Keys);
+        fieldKeys = new List<string>(dataScheme.Fields.Keys);
 
         selectsType = new List<int>();
         foreach (var t in dataScheme.Fields.Values)
         {
-            selectsType.Add(Array.IndexOf<string>(availableTypes, t.ToString()));
+            selectsType.Add(Array.IndexOf<string>(availableTypes, t.Type.ToString()));
         }
     }
 
@@ -212,18 +229,22 @@ public class ObjectSchemeWindow : EditorWindow
         tempList.Add("Add new...");
         allSchemeNames = tempList.ToArray();
 
+        selectedSchemeName = 0;
+
         if (isLoadFromStorage)
         {
-            selectedSchemeName = 0;
-
             if (tempList.Count > 1)
                 LoadScheme(tempList[0]);
             else
                 CreateScheme();
         }
-        else if (lastCount != allSchemeNames.Length) // if added new scheme, else currentSelected dont change
+        else if (lastCount < allSchemeNames.Length) // if added new scheme, else currentSelected dont change
         {
             selectedSchemeName = allSchemeNames.Length - 2;
+        }
+        else
+        {
+            initFields();
         }
     }
     #endregion
