@@ -44,7 +44,7 @@ namespace UnityStaticData
         /// <summary>
         /// Сгенерирована ли сущность для схемы
         /// </summary>
-        public bool IsGenerated { get { return System.IO.File.Exists(SourceGenerator.GetSourcePath(TypeName)); } }
+        public bool IsGenerated { get { return System.IO.File.Exists(EntitySourceGenerator.GetSourcePath(TypeName)); } }
 
         /// <summary>
         /// Создание нового экземпляра

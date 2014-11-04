@@ -193,14 +193,14 @@ public class ObjectSchemeWindow : EditorWindow
 
     private void GenerateSource()
     {
-        SourceGenerator.GenerateEntity(dataScheme);
+        EntitySourceGenerator.GenerateEntity(dataScheme);
     }
 
     private void GenerateAll()
     {
         foreach (var scheme in SchemeStorage.AllSchemes)
         {
-            SourceGenerator.GenerateEntity(scheme);
+            EntitySourceGenerator.GenerateEntity(scheme);
         }
     }
     #endregion

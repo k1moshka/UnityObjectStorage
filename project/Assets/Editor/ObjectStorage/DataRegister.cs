@@ -9,7 +9,6 @@ namespace UnityStaticData
     public static class DataRegister
     {
         private const string FILENAME = "inst.bin";
-        // TODO: переделать на генерированные ключи связзаные с ключами из SchemeStorage
         // <dataSchemeName, instances of datascheme>
         private static Dictionary<string, Instance[]> instances;
 
