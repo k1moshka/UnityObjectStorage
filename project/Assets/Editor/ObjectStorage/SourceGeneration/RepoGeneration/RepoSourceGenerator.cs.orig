@@ -1,0 +1,15 @@
+﻿using System;
+
+namespace UnityStaticData
+{
+<<<<<<< HEAD
+    public static partial class RepoSourceGenerator
+    {
+        private IRepoGenerator generator;
+=======
+    public static class RepoSourceGenerator
+    {
+
+>>>>>>> 118dbad7fd75e4a62054c2ea4f38d4bddedbed19
+    }
+}
