@@ -10,7 +10,6 @@ using System.Collections.Generic;
 /// </summary>
 public class DataStorageVisualizatorWindow : EditorWindow
 {
-    // TODO: дописать интерфейс окна
     [MenuItem("Assets/Manage Storage...")]
     [ContextMenu("Manage Storage...")]
     public static void ShowWindow()
@@ -26,6 +25,7 @@ public class DataStorageVisualizatorWindow : EditorWindow
         if (GUILayout.Button("Reload data layer")) Reload();        // button reload instances for scheme
         EditorGUILayout.Separator();
 
+        GUILayout.Label("Choose data scheme:");
         var newIndex = EditorGUILayout.Popup(schemeIndex, allSchemes); // combobox all dataschemes
         if (newIndex != schemeIndex)
         {
@@ -36,19 +36,28 @@ public class DataStorageVisualizatorWindow : EditorWindow
         }
         EditorGUILayout.Separator();
 
-        if (GUILayout.Button("Add")) // button create new instance
+        if (GUILayout.Button("Add instance")) // button create new instance
             createNewInstance();
 
         EditorGUILayout.Separator();
         EditorGUILayout.Separator();
 
-        foreach (var i in instances)
-        {
-            i.RenderFields(); // render all fields of instance
+        GUILayout.Label(allSchemes[schemeIndex] + " instances:");
 
+        var index = 0;
+        var removeIndex = -1;
+        foreach (var i in instances)
+        {           
+            i.RenderFields(); // render all fields of instance
+            if (GUILayout.Button("Remove")) removeIndex = index;
+
+            index++;
             EditorGUILayout.Separator();
             EditorGUILayout.Separator();
         }
+        
+        if (removeIndex != -1)
+            instances.RemoveAt(removeIndex);
 
         if (GUILayout.Button("Save")) saveInstances();              // button save instances for scheme
         if (GUILayout.Button("Generate")) generateInstances();      // button generate sources
@@ -79,6 +88,11 @@ public class DataStorageVisualizatorWindow : EditorWindow
     private void createNewInstance()
     {
         instances.Add(new Instance(dataScheme));
+    }
+
+    private void removeInstance()
+    {
+
     }
     #endregion
 //////////////////////////////////////////////////////////////////////////////////////////////

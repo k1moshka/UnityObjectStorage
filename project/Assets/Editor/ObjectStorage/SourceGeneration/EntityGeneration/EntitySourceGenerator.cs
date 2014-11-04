@@ -3,11 +3,11 @@ using System.IO;
 
 namespace UnityStaticData
 {
-    public static class SourceGenerator
+    public static class EntitySourceGenerator
     {
         private static IEntityGenerator generator;
 
-        static SourceGenerator()
+        static EntitySourceGenerator()
         {
             generator = new CSharpGenerator();
         }
