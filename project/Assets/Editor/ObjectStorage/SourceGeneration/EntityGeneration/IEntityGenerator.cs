@@ -17,5 +17,10 @@ namespace UnityStaticData
         /// <param name="scheme">Схема данных</param>
         /// <param name="data">Данные для сохранения</param>
         string GenerateEntity(DataScheme scheme);
+        /// <summary>
+        /// Генерирование EntityBase класса
+        /// </summary>
+        /// <returns></returns>
+        string GenerateEntityBase();
     }
 }

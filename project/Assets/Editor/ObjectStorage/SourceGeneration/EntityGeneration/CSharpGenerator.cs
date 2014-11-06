@@ -25,6 +25,7 @@ namespace UnityStaticData
             builder.Append(scheme.DataType.ToString().ToLower());
             builder.Append(' ');
             builder.Append(scheme.TypeName);
+            builder.Append(" : EntityBase");
             builder.Append("\n{\n"); // begin class bracket
 
             foreach (var kv in scheme.Fields) // render properties
@@ -46,6 +47,20 @@ namespace UnityStaticData
         public string SourceExtension
         {
             get { return "cs"; }
+        }
+        /// <summary>
+        /// Генерирование EntityBase класса
+        /// </summary>
+        /// <returns></returns>
+        public string GenerateEntityBase()
+        {
+            var source = @"using System;
+
+public {0} EntityBase
+{
+    public int Index;
+}";
+            return string.Format(source, scheme.DataType.ToString().ToLower());
         }
     }
 }

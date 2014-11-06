@@ -42,5 +42,27 @@ namespace UnityStaticData
         {
             return Settings.GetPathToSaveSources(schemeName + "." + generator.SourceExtension);
         }
+        /// <summary>
+        /// Генерирование и сохранение сурса базового для всех сущностей класса EntityBase
+        /// </summary>
+        /// <returns></returns>
+        public static void GenerateEntityBase(bool deleteIfExists = false)
+        {
+            var source = generator.GenerateEntityBase();
+
+            var pathToFile = Settings.GetPathToSaveSources("EntityBase." + generator.SourceExtension);
+            var directory = Directory.GetParent(pathToFile);
+
+            if (File.Exists(pathToFile))
+                if (deleteIfExists) File.Delete(pathToFile);
+            else
+            {
+                if (!directory.Exists)
+                    Directory.CreateDirectory(directory.ToString());
+            }
+
+            using (var stream = File.CreateText(pathToFile))
+                stream.Write(source);
+        }
     }
 }

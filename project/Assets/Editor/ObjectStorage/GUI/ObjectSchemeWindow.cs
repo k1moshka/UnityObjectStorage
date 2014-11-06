@@ -103,6 +103,7 @@ public class ObjectSchemeWindow : EditorWindow
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Generate")) GenerateSource(); // button generate source
         if (GUILayout.Button("Generate all")) GenerateAll();
+        if (GUILayout.Button("Regenerate EntityBase")) EntitySourceGenerator.GenerateEntityBase(true);
         GUILayout.EndHorizontal();
         GUILayout.EndVertical();
         EditorGUILayout.EndScrollView();
@@ -193,11 +194,15 @@ public class ObjectSchemeWindow : EditorWindow
 
     private void GenerateSource()
     {
+        EntitySourceGenerator.GenerateEntityBase();
+
         EntitySourceGenerator.GenerateEntity(dataScheme);
     }
 
     private void GenerateAll()
     {
+        EntitySourceGenerator.GenerateEntityBase();
+
         foreach (var scheme in SchemeStorage.AllSchemes)
         {
             EntitySourceGenerator.GenerateEntity(scheme);
