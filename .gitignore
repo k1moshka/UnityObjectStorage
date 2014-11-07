@@ -37,3 +37,9 @@ project/ehthumbs.db
 project/Thumbs.db
 project/Assets/Editor/help.txt
 project/Assets/Editor/help.txt.meta
+
+# ============ #
+# Unit testing #
+# ============ #
+UnityObjectStorage.Tests/obj
+UnityObjectStorage.Tests/bin
