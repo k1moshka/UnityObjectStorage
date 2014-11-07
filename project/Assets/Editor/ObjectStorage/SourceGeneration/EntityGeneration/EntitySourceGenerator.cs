@@ -12,6 +12,20 @@ namespace UnityStaticData
             generator = new CSharpGenerator();
         }
         /// <summary>
+        /// Получение сгенерированного сурса для схемы данных
+        /// </summary>
+        /// <param name="schemeName">Название схемы данных</param>
+        /// <returns></returns>
+        public static string GetGeneratedSource(string schemeName)
+        {
+            var path = Settings.GetPathToSaveSources(schemeName + '.' + generator.SourceExtension);
+
+            if (File.Exists(path))
+                return File.ReadAllText(path);
+
+            return null;
+        }
+        /// <summary>
         /// Генерирование и сохранение сурса для схемы данных
         /// </summary>
         /// <param name="scheme">Имя схемы данных</param>
