@@ -60,7 +60,7 @@ public {0} EntityBase
 {
     public int Index;
 }";
-            return string.Format(source, scheme.DataType.ToString().ToLower());
+            return string.Format(source, "class");
         }
     }
 }
