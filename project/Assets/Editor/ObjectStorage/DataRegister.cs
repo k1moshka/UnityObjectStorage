@@ -54,6 +54,9 @@ namespace UnityStaticData
         /// <returns></returns>
         public static Instance[] GetInstances(string dataSchemeName)
         {
+            if (dataSchemeName == "EntityBase")
+                return new Instance[0];
+
             var refferenceKey = SchemeStorage.GetSchemeKey(dataSchemeName);
 
             if (!DataRegister.instances.ContainsKey(refferenceKey))
