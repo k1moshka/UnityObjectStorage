@@ -43,3 +43,4 @@ project/Assets/Editor/help.txt.meta
 # ============ #
 UnityObjectStorage.Tests/obj
 UnityObjectStorage.Tests/bin
+UnityObjectStorage.Tests/testData
