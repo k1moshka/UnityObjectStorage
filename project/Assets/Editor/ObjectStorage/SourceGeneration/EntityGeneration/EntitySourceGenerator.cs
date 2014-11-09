@@ -6,6 +6,10 @@ namespace UnityStaticData
     public static class EntitySourceGenerator
     {
         private static IEntityGenerator generator;
+        /// <summary>
+        /// Сгенерирован ли сурс для EntityBase
+        /// </summary>
+        public static bool IsEntityBaseGenerated { get { return File.Exists(GetSourcePath("EntityBase")); } }
 
         static EntitySourceGenerator()
         {
@@ -68,7 +72,9 @@ namespace UnityStaticData
             var directory = Directory.GetParent(pathToFile);
 
             if (File.Exists(pathToFile))
+            {
                 if (deleteIfExists) File.Delete(pathToFile);
+            }
             else
             {
                 if (!directory.Exists)

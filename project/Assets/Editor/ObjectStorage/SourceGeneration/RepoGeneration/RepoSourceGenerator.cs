@@ -4,6 +4,6 @@ namespace UnityStaticData
 {
     public static partial class RepoSourceGenerator
     {
-        private IRepoGenerator generator;
+        private static IRepoGenerator generator;
     }
 }
