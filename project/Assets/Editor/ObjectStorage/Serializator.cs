@@ -25,7 +25,7 @@ namespace UnityStaticData
             /// <summary>
             /// ХМЛ
             /// </summary>
-            XML,
+            //XML,
             /// <summary>
             /// ДЖСОН
             /// </summary>
@@ -44,8 +44,8 @@ namespace UnityStaticData
                 {
                     case SerializationType.Binary:
                         return binSer;
-                    case SerializationType.XML:
-                        return xmlSer;
+                    //case SerializationType.XML:
+                    //    return xmlSer;
                     //case SerializationType.JSON:
                     //    return jsonSer;
                     default:
