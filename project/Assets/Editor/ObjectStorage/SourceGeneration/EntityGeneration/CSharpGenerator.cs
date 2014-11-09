@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 
 namespace UnityStaticData
@@ -19,22 +20,22 @@ namespace UnityStaticData
         {
             builder.Remove(0, builder.Length); // clear builder
 
-            builder.Append("using System;\n\n");
-            builder.Append("[Serializable]\n");
+            builder.Append("using System;\r\n\r\n");
+            builder.Append("[Serializable]\r\n");
             builder.Append("public ");
             builder.Append(scheme.DataType.ToString().ToLower());
             builder.Append(' ');
             builder.Append(scheme.TypeName);
             builder.Append(" : EntityBase");
-            builder.Append("\n{\n"); // begin class bracket
+            builder.Append("\r\n{\r\n"); // begin class bracket
 
             foreach (var kv in scheme.Fields) // render properties
             {
                 builder.Append("    public ");
                 builder.Append(kv.Value.Type.TypeName); 
                 builder.Append(" ");
-                builder.Append(kv.Key);
-                builder.Append(" { get; set; }\n");
+                builder.Append(kv.Value.Name);
+                builder.Append(" { get; set; }\r\n");
             }
 
             builder.Append(@"}"); // end class bracket
@@ -54,13 +55,11 @@ namespace UnityStaticData
         /// <returns></returns>
         public string GenerateEntityBase()
         {
-            var source = @"using System;
+            builder.Remove(0, builder.Length);
 
-public {0} EntityBase
-{
-    public int Index;
-}";
-            return string.Format(source, "class");
+            builder.Append(string.Format("using System;\r\n[Serializable]\r\npublic {0} EntityBase", "class"));
+            builder.Append("\r\n{\r\n\tpublic int Index;\r\n}");
+            return builder.ToString();
         }
     }
 }
