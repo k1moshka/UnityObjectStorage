@@ -52,10 +52,10 @@ public class ObjectSchemeWindow : EditorWindow
 
         schemeName = EditorGUILayout.TextField("Scheme Name:", schemeName); // change scheme name
 
-        EditorGUILayout.BeginHorizontal();
-        dataScheme.StorageType = (StorageType)EditorGUILayout.EnumPopup(dataScheme.StorageType);
-        dataScheme.DataType = (DataType)EditorGUILayout.EnumPopup(dataScheme.DataType);
-        EditorGUILayout.EndHorizontal();
+        //EditorGUILayout.BeginHorizontal();
+        //dataScheme.StorageType = (StorageType)EditorGUILayout.EnumPopup(dataScheme.StorageType);
+        //dataScheme.DataType = (DataType)EditorGUILayout.EnumPopup(dataScheme.DataType);
+        //EditorGUILayout.EndHorizontal();
 
         GUILayout.Label("Data fields");
 
@@ -67,7 +67,7 @@ public class ObjectSchemeWindow : EditorWindow
             var key = dataScheme.AddField(new Field() { Type = Settings.GetDescriptor(availableTypes[0]) });
             fieldKeys.Add(key);
         }
-        // TOOO: ренейм полей
+
         for (int i = 0; i < fieldsCount; i++) // begin fields render
         {
             EditorGUILayout.Separator();
