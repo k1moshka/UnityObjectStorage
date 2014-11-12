@@ -52,11 +52,6 @@ public class ObjectSchemeWindow : EditorWindow
 
         schemeName = EditorGUILayout.TextField("Scheme Name:", schemeName); // change scheme name
 
-        //EditorGUILayout.BeginHorizontal();
-        //dataScheme.StorageType = (StorageType)EditorGUILayout.EnumPopup(dataScheme.StorageType);
-        //dataScheme.DataType = (DataType)EditorGUILayout.EnumPopup(dataScheme.DataType);
-        //EditorGUILayout.EndHorizontal();
-
         GUILayout.Label("Data fields");
 
         if (GUILayout.Button("Add scheme field")) // button add fields to scheme
@@ -96,13 +91,12 @@ public class ObjectSchemeWindow : EditorWindow
         EditorGUILayout.Separator();
 
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Save")) SaveScheme(); // button save current scheme
-        if (GUILayout.Button("Remove")) RemoveScheme(); // button remove current scheme
+        if (GUILayout.Button("Save scheme")) SaveScheme(); // button save current scheme
+        if (GUILayout.Button("Remove scheme")) RemoveScheme(); // button remove current scheme
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Generate")) GenerateSource(); // button generate source
-        if (GUILayout.Button("Generate all")) GenerateAll();
+        if (GUILayout.Button("Generate sources")) GenerateAll();
         if (GUILayout.Button("Regenerate EntityBase")) EntitySourceGenerator.GenerateEntityBase(true);
         GUILayout.EndHorizontal();
         GUILayout.EndVertical();
@@ -192,13 +186,6 @@ public class ObjectSchemeWindow : EditorWindow
         initRegisteredSchemesCombo();
     }
 
-    private void GenerateSource()
-    {
-        EntitySourceGenerator.GenerateEntityBase();
-
-        EntitySourceGenerator.GenerateEntity(dataScheme);
-    }
-
     private void GenerateAll()
     {
         EntitySourceGenerator.GenerateEntityBase();
@@ -207,6 +194,9 @@ public class ObjectSchemeWindow : EditorWindow
         {
             EntitySourceGenerator.GenerateEntity(scheme);
         }
+
+        AssetDatabase.Refresh();
+        this.Close();
     }
     #endregion
 
