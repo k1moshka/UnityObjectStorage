@@ -88,12 +88,13 @@ namespace UnityStaticData
         /// <param name="schemeName">Название схемы</param>
         public static void RemoveScheme(string schemeName)
         {
-            if (_instance.schemes.ContainsKey(schemeName))
+            var scheme = GetScheme(schemeName);
+            if (scheme != null)
             {
-                _instance.schemes[schemeName].CleanUpHandlers();
-                _instance.schemes.Remove(schemeName);
+                scheme.CleanUpHandlers();
+                var removingSchemeKey = GetSchemeKey(schemeName);
 
-                raiseSchemesChanged(schemeName, false);
+                _instance.schemes.Remove(removingSchemeKey);
             }
         }
         /// <summary>
