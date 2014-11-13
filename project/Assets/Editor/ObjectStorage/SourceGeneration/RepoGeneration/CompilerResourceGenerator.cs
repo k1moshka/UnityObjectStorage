@@ -18,8 +18,9 @@ namespace UnityStaticData
         /// Генерирование ресурсов на основе переданных схем данных
         /// </summary>
         /// <param name="path">Путь до файла в который сохраняться будут ресурсы</param>
+        /// <param name="pathToAssembly">Путь до сборки проекта</param>
         /// <param name="schemes">Схемы инстансы которых необходимо сохранить в ресурсах</param>
-        public void GenerateResourceRepository(string path, DataScheme[] schemes)
+        public void GenerateResourceRepository(string path, string pathToAssembly, DataScheme[] schemes)
         {
             var fullSource = new StringBuilder("using System;using UnityEngine;");
             fullSource.Append(removeUsings(EntitySourceGenerator.GetGeneratedSource("EntityBase")));
@@ -37,18 +38,7 @@ namespace UnityStaticData
                     throw new InvalidOperationException("Entity sources must be generated before generate resources :(");
             }
 
-            var provider = new CSharpCodeProvider();
-            var parameters = new CompilerParameters();
-
-            parameters.GenerateInMemory = false;
-            parameters.GenerateExecutable = false;
-
-            var unityAssembly = Assembly.GetAssembly(typeof(UnityEngine.Vector3));
-            parameters.ReferencedAssemblies.Add(unityAssembly.Location);
-
-            var results = provider.CompileAssemblyFromSource(parameters, fullSource.ToString());
-
-            var allTypes = results.CompiledAssembly.GetTypes();
+            var allTypes = Assembly.LoadFile(pathToAssembly).GetTypes();
 
             var serDict = new Dictionary<string, object[]>();
 
