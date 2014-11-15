@@ -100,11 +100,6 @@ public class DataStorageVisualizatorWindow : EditorWindow
         instances.Add(new Instance(dataScheme));
         folds.Add(true);
     }
-
-    private void removeInstance()
-    {
-
-    }
     #endregion
 //////////////////////////////////////////////////////////////////////////////////////////////
     #region window events
