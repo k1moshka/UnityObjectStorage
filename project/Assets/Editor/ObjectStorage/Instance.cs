@@ -33,7 +33,7 @@ namespace UnityStaticData
             DataScheme = scheme;
             FieldsValues = new Dictionary<string, Field>();
 
-            foreach (var f in DataScheme.Fields)
+            foreach (var f in getFields(DataScheme.TypeName))
             {
                 FieldsValues.Add(f.Key, new Field(f.Value.Type) { Name = f.Value.Name });
             }
@@ -88,8 +88,28 @@ namespace UnityStaticData
             }
         }
 
+
         #region helpers
         private readonly static List<string> helpList = new List<string>();
+        // рекурсивное получение всех свойств класса
+        private Dictionary<string, Field> getFields(string schemeName)
+        {
+            var result = new Dictionary<string, Field>();
+            var dataScheme = SchemeStorage.GetScheme(schemeName);
+            if (dataScheme != null)
+            {
+                foreach (var kv in getFields(dataScheme.InheritanceType))
+                {
+                    result.Add(kv.Key, kv.Value);
+                }
+                foreach (var kv in dataScheme.Fields)
+                {
+                    result.Add(kv.Key, kv.Value);
+                }
+                return result;
+            }
+            return new Dictionary<string, Field>();
+        }
         #endregion
     }
 }

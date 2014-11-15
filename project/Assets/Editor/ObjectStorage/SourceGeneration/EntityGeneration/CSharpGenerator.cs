@@ -26,7 +26,8 @@ namespace UnityStaticData
             builder.Append(scheme.DataType.ToString().ToLower());
             builder.Append(' ');
             builder.Append(scheme.TypeName);
-            builder.Append(" : EntityBase");
+            builder.Append(" : ");
+            builder.Append(scheme.InheritanceType);
             builder.Append("\r\n{\r\n"); // begin class bracket
 
             foreach (var kv in scheme.Fields) // render properties

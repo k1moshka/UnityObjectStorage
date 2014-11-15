@@ -45,6 +45,10 @@ namespace UnityStaticData
         /// Сгенерирована ли сущность для схемы
         /// </summary>
         public bool IsGenerated { get { return System.IO.File.Exists(EntitySourceGenerator.GetSourcePath(TypeName)); } }
+        /// <summary>
+        /// Насоелуемый тип, по дефолту EntityBase
+        /// </summary>
+        public string InheritanceType { get; set; }
 
         /// <summary>
         /// Создание нового экземпляра
@@ -52,6 +56,7 @@ namespace UnityStaticData
         public DataScheme()
         {
             Fields = new Dictionary<string, Field>();
+            InheritanceType = "EntityBase";
         }
         /// <summary>
         /// Добавление нового поля в схему данных. Возвращает ключ для нового поля.

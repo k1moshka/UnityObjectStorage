@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using UnityStaticData;
 using System.Collections.Generic;
+using System.IO;
 
 /// <summary>
 /// Окно инициализатора сторэйджа для конкретного типа объектов
@@ -47,13 +48,18 @@ public class DataStorageVisualizatorWindow : EditorWindow
         var index = 0;
         var removeIndex = -1;
         foreach (var i in instances)
-        {           
-            i.RenderFields(); // render all fields of instance
-            if (GUILayout.Button("Remove")) removeIndex = index;
+        {
+            folds[index] = EditorGUILayout.Foldout(folds[index], "Instance");
+            if (folds[index])
+            {
+                i.RenderFields(); // render all fields of instance
+                if (GUILayout.Button("Remove")) removeIndex = index;
+
+                EditorGUILayout.Separator();
+                EditorGUILayout.Separator();
+            }
 
             index++;
-            EditorGUILayout.Separator();
-            EditorGUILayout.Separator();
         }
         
         if (removeIndex != -1)
@@ -82,12 +88,17 @@ public class DataStorageVisualizatorWindow : EditorWindow
 
     private void generateInstances()
     {
-        // TODO: реализовать генерирование сурсов или ресурсов инстансов и конечный апи репозитория + проверка сгенерены ли сурсы для текущей схемы
+        RepoSourceGenerator.GenerateRepo(
+            Settings.Instance.PathToSaveSources,
+            "Assets/Resource/sample.bin",
+            "obj/Debug/Assembly-CSharp.dll"
+            );
     }
 
     private void createNewInstance()
     {
         instances.Add(new Instance(dataScheme));
+        folds.Add(true);
     }
 
     private void removeInstance()
@@ -117,6 +128,7 @@ public class DataStorageVisualizatorWindow : EditorWindow
 //////////////////////////////////////////////////////////////////////////////////////////////
     #region gui helpers
     private Vector2 scrollPos;
+    private List<bool> folds = new List<bool>(); // для фолдаутов
 
     // load all schemes from storage
     private string[] allSchemes;
@@ -151,6 +163,9 @@ public class DataStorageVisualizatorWindow : EditorWindow
         {
             instances.Clear();
             instances.AddRange(DataRegister.GetInstances(dataScheme.TypeName));
+
+            folds.Clear();
+            folds.AddRange(new bool[instances.Count]);
         }
     }
     #endregion

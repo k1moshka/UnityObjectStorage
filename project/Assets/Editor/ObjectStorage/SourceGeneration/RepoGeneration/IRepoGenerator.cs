@@ -10,8 +10,9 @@ namespace UnityStaticData
         /// <summary>
         /// Генерация сурсов для репозитория, на основе переданных инстансов.Возвращает исходный код репозтория
         /// </summary>
-        /// <param name="instances">Инстансы для которых нужно создать репозиторий</param>
+        /// <param name="schemeNames">Инстансы для которых нужно создать репозиторий</param>
+        /// <param name="pathToResoures">Путь до файла сериализированных ресурсов</param>
         /// <returns></returns>
-        string GenerateRepo(Instance[] instances);
+        string GenerateRepo(string[] schemeNames, string pathToResoures);
     }
 }

@@ -40,6 +40,7 @@ public class ObjectSchemeWindow : EditorWindow
         GUILayout.Label(dataScheme.TypeName + " - change object scheme"); // header
 
         var selected = EditorGUILayout.Popup("All schemes", selectedSchemeName, allSchemeNames);
+
         if (selected != selectedSchemeName)
         {
             selectedSchemeName = selected;
@@ -51,6 +52,13 @@ public class ObjectSchemeWindow : EditorWindow
         }
 
         schemeName = EditorGUILayout.TextField("Scheme Name:", schemeName); // change scheme name
+
+        var newIndex = EditorGUILayout.Popup("Inherits from: ", inhIndex, registeredSchemes); // combo inhertitance type
+        if (newIndex != inhIndex)
+        {
+            dataScheme.InheritanceType = registeredSchemes[newIndex];
+            inhIndex = newIndex;
+        }
 
         GUILayout.Label("Data fields");
 
@@ -70,16 +78,26 @@ public class ObjectSchemeWindow : EditorWindow
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.BeginVertical();
 
-            var field = dataScheme.Fields[fieldKeys[i]];
+            Field field = null;
+            try
+            {
+                field = dataScheme.Fields[fieldKeys[i]];
+            } 
+            catch (KeyNotFoundException)
+            {
+                // чтото пошло не так в общем случае это перекомпиляция проекта
+                ReloadStorage();
+                break;
+            }
 
             // handle rename field
             field.Name = EditorGUILayout.TextField("Field Name:", field.Name);
 
-            // handle change type of field
+            // handle change type of field 
             var lastSelectedType = selectsType[i];
             selectsType[i] = EditorGUILayout.Popup("Field Type:", selectsType[i], availableTypes);
             if (lastSelectedType != selectsType[i])
-                field.Type = Settings.GetDescriptor(availableTypes[selectsType[i]]);
+                field.Type = Settings.GetDescriptor(availableTypes[selectsType[i]]);   
 
             EditorGUILayout.EndVertical();
 
@@ -115,6 +133,7 @@ public class ObjectSchemeWindow : EditorWindow
     {
         DataRegister.Prepare();
         initRegisteredSchemesCombo();
+        initInheritanceCombo();
 
         schemeName = dataScheme.TypeName;
     }
@@ -127,9 +146,10 @@ public class ObjectSchemeWindow : EditorWindow
     private void LoadScheme(string schemeName)
     {
         dataScheme = SchemeStorage.GetScheme(schemeName);
-        schemeName = lastValidSchemeName = dataScheme.TypeName;
+        this.schemeName = this.lastValidSchemeName = dataScheme.TypeName;
 
         initFields();
+        initInheritanceCombo();
     }
 
     private void CreateScheme()
@@ -137,6 +157,7 @@ public class ObjectSchemeWindow : EditorWindow
         dataScheme = new DataScheme();
 
         initFields();
+        initInheritanceCombo();
 
         schemeName = dataScheme.TypeName = "<define scheme name>";
     }
@@ -160,7 +181,7 @@ public class ObjectSchemeWindow : EditorWindow
 
         SchemeStorage.SaveAtProject();
 
-        initRegisteredSchemesCombo(false);
+        initInheritanceCombo();
     }
 
     private void RemoveScheme()
@@ -169,6 +190,7 @@ public class ObjectSchemeWindow : EditorWindow
         SchemeStorage.SaveAtProject();
 
         initRegisteredSchemesCombo(true);
+        initInheritanceCombo();
     }
 
     private void RemoveField(int index)
@@ -184,6 +206,9 @@ public class ObjectSchemeWindow : EditorWindow
     {
         SchemeStorage.ReloadStorage();
         initRegisteredSchemesCombo();
+        initInheritanceCombo();
+
+        Debug.Log(string.Format("reloaded", new object[] {   }));
     }
 
     private void GenerateAll()
@@ -197,7 +222,7 @@ public class ObjectSchemeWindow : EditorWindow
 
         AssetDatabase.Refresh();
         this.Close();
-    }
+    } 
     #endregion
 
     #region gui helpers
@@ -241,6 +266,20 @@ public class ObjectSchemeWindow : EditorWindow
         {
             initFields();
         }
+    }
+
+    private int inhIndex;
+    private string[] registeredSchemes;
+    // инициализация комобобокса которыйпоказывает наследуюмую сущность по дефолту EntityBase
+    private void initInheritanceCombo()
+    {
+        var tempList = new List<string>();
+        tempList.Add("EntityBase");
+        tempList.AddRange(SchemeStorage.GetAllRegisteredSchemes());
+        tempList.Remove(dataScheme.TypeName);
+
+        registeredSchemes = tempList.ToArray();
+        inhIndex = Array.IndexOf<string>(registeredSchemes, dataScheme.InheritanceType);
     }
     #endregion
 }

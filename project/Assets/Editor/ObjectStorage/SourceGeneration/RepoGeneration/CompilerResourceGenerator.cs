@@ -40,24 +40,33 @@ namespace UnityStaticData
 
             var allTypes = Assembly.LoadFile(pathToAssembly).GetTypes();
 
-            var serDict = new Dictionary<string, object[]>();
+            var serDict = new Dictionary<string, object>();
+            var dataTypes = SchemeStorage.GetAllRegisteredSchemes();
 
             foreach (var t in allTypes)
             {
+                if (!dataTypes.Contains(t.Name))
+                    continue;
+
                 var constructor = t.GetConstructor(new Type[0]);
+
                 var instances = DataRegister.GetInstances(t.Name);
-                var instancesToSerialize = new object[instances.Length];
+                
+                var instancesToSerialize = Array.CreateInstance(t, instances.Length);                
                 var index = 0;
 
                 foreach (var i in instances)
                 {
-                    var newObj = instancesToSerialize[index] = constructor.Invoke(null);
+                    var newObj = constructor.Invoke(null);
+
+                    instancesToSerialize.SetValue(newObj, index);
 
                     foreach (var f in i.FieldsValues)
                     {
                         t
                             .GetProperty(f.Value.Name)
                             .SetValue(newObj, f.Value.Value, null);
+                        
                     }
 
                     index++;
@@ -65,11 +74,11 @@ namespace UnityStaticData
 
                 serDict.Add(
                     t.Name, 
-                    instancesToSerialize.ToArray()
+                    instancesToSerialize
                 );
             }
 
-            Serializator.SaveTo<Dictionary<string, object[]>>(path, serDict);
+            Serializator.SaveTo<Dictionary<string, object>>(path, serDict);
         }
 
         private string removeUsings(string source)

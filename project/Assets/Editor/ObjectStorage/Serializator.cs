@@ -54,12 +54,12 @@ namespace UnityStaticData
                 return null;
             }
         }
-        private static ISerializationProvider xmlSer, jsonSer, binSer;
+        private static ISerializationProvider binSer;
 
         static Serializator()
         {
-            xmlSer = new XMLSerializator();
-            jsonSer = new JSONSerializator();
+            //xmlSer = new XMLSerializator();
+            //jsonSer = new JSONSerializator();
             binSer = new BinarySerializator();
         }
 

@@ -46,9 +46,9 @@ namespace UnityStaticData
                     new TypeDescriptor() { TypeName = "UnityEngine.Vector2", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderVector2" }, 
                     new TypeDescriptor() { TypeName = "UnityEngine.Vector3", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderVector3" }, 
                     new TypeDescriptor() { TypeName = "UnityEngine.Vector4", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderVector4" }, 
-                    new TypeDescriptor() { TypeName = "UnityEngine.Quaternion", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderQuaternion" }, 
+                    new TypeDescriptor() { TypeName = "UnityEngine.Quaternion", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderQuaternion" },
+                    // TODO: добавить спрайты, цвет, префабы
                     new TypeDescriptor() { TypeName = "UnityEngine.Sprite", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderSprite" }, 
-                    new TypeDescriptor() { TypeName = "UnityEngine.UnityObject", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderUnityObject" }, 
                 }
             );
         }
