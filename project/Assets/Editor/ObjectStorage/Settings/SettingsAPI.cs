@@ -45,6 +45,15 @@ namespace UnityStaticData
             Instance.types.Add(descr);
         }
         /// <summary>
+        /// Получение валидного пути, на основе настроек для сохранения файла ресурса репозитория
+        /// </summary>
+        /// <param name="fileName">Имя файла</param>
+        /// <returns></returns>
+        public static string GetPathToSaveResources()
+        {
+            return RESOURCES_PATH + Instance.ResourcesFileName;
+        }
+        /// <summary>
         /// Получение всех зарегистрированных типов в виде массива строк
         /// </summary>
         /// <returns></returns>

@@ -15,6 +15,8 @@ namespace UnityStaticData
         private const string DEFAULT_PATH = "Assets/DataLayer/";
         private const string SETTING_PATH = "Assets/Editor/UnityStaticData/s.set";
         private const string SOURCES_PATH = "Assets/Scripts/Data";
+        private const string RESOURCES_FILE_NAME = "dataLayerResources.bin";
+        private const string RESOURCES_PATH = "Assets/Resources/";
 
         /// <summary>
         /// Путь к папке сохранения данных
@@ -24,6 +26,10 @@ namespace UnityStaticData
         /// Путь к папке сохранения сгенерированных сурсов
         /// </summary>
         public string PathToSaveSources { get; set; }
+        /// <summary>
+        /// Имя файла ресурсов репозитория
+        /// </summary>
+        public string ResourcesFileName { get; set; }
 
         private List<TypeDescriptor> types = new List<TypeDescriptor>();
         // Записывается только один раз на загрузке настроек, при дессериализации ли создании новых настроек
@@ -36,6 +42,7 @@ namespace UnityStaticData
         {
             PathToSaveData = DEFAULT_PATH;
             PathToSaveSources = SOURCES_PATH;
+            ResourcesFileName = RESOURCES_FILE_NAME;
             types = new List<TypeDescriptor>(
                 new TypeDescriptor[] { 
                     new TypeDescriptor() { TypeName = "System.Int32", ToStringValue = "int", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderInt" }, 

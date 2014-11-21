@@ -123,6 +123,29 @@ namespace UnityStaticData
             _instance = loadFromDisk();
         }
         /// <summary>
+        /// Синхронизация связанных схем относительно переданной схем
+        /// </summary>
+        /// <param name="dataScheme">Схема относительно которой синхронизируются связи</param>
+        public static void ProcessRelations(DataScheme dataScheme)
+        {
+            //TODO: убрать повторяющиеся связи
+            foreach (var r in dataScheme.Relations)
+            {
+                var mirrorEntity = GetScheme(r.EntityName);
+
+                var newRelation = new Relation()
+                {
+                    EntityName = dataScheme.TypeName,
+                    RelationType = mirrorType(r.RelationType)
+                };
+
+                if (!mirrorEntity.Relations.Contains(newRelation))
+                    mirrorEntity.Relations.Add(newRelation);
+
+                raiseSchemesChanged(r.EntityName, false);
+            }
+        }
+        /// <summary>
         /// Загрузка с диска текущей версии хранилища
         /// </summary>
         /// <returns></returns>
@@ -142,6 +165,21 @@ namespace UnityStaticData
         {
             if (OnSchemesChanged != null)
                 OnSchemesChanged(new SchemeChangedEventArgs() { SchemeName = schemeName, IsAdding = isAdding });
+        }
+
+        private static RelationType mirrorType(RelationType targetType)
+        {
+            switch (targetType)
+            {
+                case RelationType.OneToMany:
+                    return RelationType.ManyToOne;
+                case RelationType.OneToOne:
+                    return RelationType.OneToOne;
+                case RelationType.ManyToOne:
+                    return RelationType.OneToMany;
+                default:
+                    throw new ArgumentException("Argument is not valid relation type. Argument value: " + (int)targetType);
+            }
         }
 
         public class SchemeChangedEventArgs

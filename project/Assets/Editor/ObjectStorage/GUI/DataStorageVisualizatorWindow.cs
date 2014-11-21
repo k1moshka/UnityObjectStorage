@@ -49,10 +49,17 @@ public class DataStorageVisualizatorWindow : EditorWindow
         var removeIndex = -1;
         foreach (var i in instances)
         {
-            folds[index] = EditorGUILayout.Foldout(folds[index], "Instance");
-            if (folds[index])
+            instanceFolds[index] = EditorGUILayout.Foldout(instanceFolds[index], "Instance");
+            if (instanceFolds[index])
             {
                 i.RenderFields(); // render all fields of instance
+
+                EditorGUILayout.BeginVertical(GUI.skin.box);
+                relFolds[index] = EditorGUILayout.Foldout(relFolds[index], "Related entities:");
+                if (relFolds[index])
+                    i.RenderRelations(potentialRelations); // render relations
+                EditorGUILayout.EndVertical();
+
                 if (GUILayout.Button("Remove")) removeIndex = index;
 
                 EditorGUILayout.Separator();
@@ -61,9 +68,12 @@ public class DataStorageVisualizatorWindow : EditorWindow
 
             index++;
         }
-        
+
         if (removeIndex != -1)
+        {
             instances.RemoveAt(removeIndex);
+            calculateIds();
+        }
 
         if (GUILayout.Button("Save")) saveInstances();              // button save instances for scheme
         if (GUILayout.Button("Generate")) generateInstances();      // button generate sources
@@ -89,16 +99,27 @@ public class DataStorageVisualizatorWindow : EditorWindow
     private void generateInstances()
     {
         RepoSourceGenerator.GenerateRepo(
-            Settings.Instance.PathToSaveSources,
-            "Assets/Resource/sample.bin",
             "obj/Debug/Assembly-CSharp.dll"
-            );
+         );
     }
 
     private void createNewInstance()
     {
         instances.Add(new Instance(dataScheme));
-        folds.Add(true);
+
+        calculateIds();
+
+        instanceFolds.Add(true);
+        relFolds.Add(false);
+    }
+
+    private void calculateIds()
+    {
+        var index = 0;
+        foreach (var i in instances)
+        {
+            i.FieldsValues["id"].Value = index++;
+        }
     }
     #endregion
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,7 +131,7 @@ public class DataStorageVisualizatorWindow : EditorWindow
         loadInstances();
 
         SchemeStorage.OnSchemesChanged += SchemeStorage_OnSchemesChanged;
-    }
+    }   
 
     public void OnDestroy()
     {
@@ -123,7 +144,6 @@ public class DataStorageVisualizatorWindow : EditorWindow
 //////////////////////////////////////////////////////////////////////////////////////////////
     #region gui helpers
     private Vector2 scrollPos;
-    private List<bool> folds = new List<bool>(); // для фолдаутов
 
     // load all schemes from storage
     private string[] allSchemes;
@@ -148,9 +168,13 @@ public class DataStorageVisualizatorWindow : EditorWindow
             dataScheme.OnFieldsChanged += dataScheme_OnChanged;
             dataScheme.OnRenameScheme += dataScheme_OnRenameScheme;
         }
+
+        loadPotentialRelations();
     }
 
     private List<Instance> instances = new List<Instance>();
+    private List<bool> instanceFolds = new List<bool>(); // для фолдаутов инстансов
+    private List<bool> relFolds = new List<bool>(); // для фолдаутов связанных сущностей
     // загрузка текущих данных для выбранной схемы
     private void loadInstances()
     {
@@ -159,9 +183,30 @@ public class DataStorageVisualizatorWindow : EditorWindow
             instances.Clear();
             instances.AddRange(DataRegister.GetInstances(dataScheme.TypeName));
 
-            folds.Clear();
-            folds.AddRange(new bool[instances.Count]);
+            instanceFolds.Clear();
+            instanceFolds.AddRange(new bool[instances.Count]);
+
+            relFolds.Clear();
+            relFolds.AddRange(new bool[instanceFolds.Count]);
         }
+    }
+
+    private string[][] potentialRelations;
+    private void loadPotentialRelations()
+    {
+        var tempList = new List<string[]>();
+        foreach (var r in dataScheme.Relations)
+        {
+            var instances = DataRegister.GetInstances(r.EntityName);
+            var strs = new string[instances.Length];
+
+            for (int i = 0; i < instances.Length; i++)
+            {
+                strs[i] = instances[i].ToString();
+            }
+            tempList.Add(strs);
+        }
+        potentialRelations = tempList.ToArray();
     }
     #endregion
 //////////////////////////////////////////////////////////////////////////////////////////////

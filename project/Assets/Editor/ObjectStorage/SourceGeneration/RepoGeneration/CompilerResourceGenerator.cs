@@ -7,6 +7,8 @@ using System.Linq;
 using System.Reflection;
 using System.IO;
 
+using UnityEngine;
+
 namespace UnityStaticData
 {
     /// <summary>
@@ -52,8 +54,10 @@ namespace UnityStaticData
 
                 var instances = DataRegister.GetInstances(t.Name);
                 
-                var instancesToSerialize = Array.CreateInstance(t, instances.Length);                
+                var instancesToSerialize = Array.CreateInstance(t, instances.Length);       
                 var index = 0;
+
+                var dataType = SchemeStorage.GetScheme(t.ToString());
 
                 foreach (var i in instances)
                 {
@@ -61,12 +65,39 @@ namespace UnityStaticData
 
                     instancesToSerialize.SetValue(newObj, index);
 
+                    // TODO: добавить проверку не только свойст но и полей (advanced)
                     foreach (var f in i.FieldsValues)
                     {
                         t
                             .GetProperty(f.Value.Name)
                             .SetValue(newObj, f.Value.Value, null);
-                        
+                    }
+
+                    foreach (var kv in i.Relations)
+                    {
+                        if (kv.Value.Length > 0)
+                        {
+                            var relationType = kv.Key;
+                            var rType = (from __relationType in dataType.Relations
+                                         where __relationType.EntityName == relationType
+                                         select __relationType.RelationType).FirstOrDefault();
+
+                            var indexesFieldName = RepoSourceGenerator.GetNameForIndexes(relationType, rType == RelationType.OneToMany);
+
+                            if ((rType == RelationType.ManyToOne || rType == RelationType.OneToOne) && kv.Value != null)
+                            {
+                                t
+                                    .GetField(indexesFieldName, BindingFlags.NonPublic | BindingFlags.Instance)
+                                    .SetValue(newObj, kv.Value[0]);
+                            }
+                            else
+                            {
+                                var ids = kv.Value != null ? kv.Value.ToArray() : new int[0];
+                                t
+                                    .GetField(indexesFieldName, BindingFlags.NonPublic | BindingFlags.Instance)
+                                    .SetValue(newObj, ids);
+                            }
+                        }
                     }
 
                     index++;

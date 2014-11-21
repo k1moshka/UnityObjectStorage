@@ -31,6 +31,17 @@ public class ObjectSchemeWindow : EditorWindow
     // последнее правильное имя схемы
     private string lastValidSchemeName;
 
+    // наследуемые поля
+    private int inhIndex;
+    private string[] registeredSchemes;
+    
+    // combo relation entity and combo relation type
+    private bool isRelationsFolded;
+    private List<int> relEntityIndexes = new List<int>();
+    private List<int> relTypeIndexes = new List<int>();
+    private string[] typesForRelations;
+    private string[] relTypes = new string[] { "1:m", "1:1", "m:1", };
+
     // gui render
     public void OnGUI()
     {
@@ -59,6 +70,36 @@ public class ObjectSchemeWindow : EditorWindow
             dataScheme.InheritanceType = registeredSchemes[newIndex];
             inhIndex = newIndex;
         }
+
+        EditorGUILayout.Separator();
+        EditorGUILayout.Separator();
+
+        isRelationsFolded = EditorGUILayout.Foldout(isRelationsFolded, "Relations");
+        if (isRelationsFolded)
+        {
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Relations");
+            if (GUILayout.Button("Add relation")) CreateNewRelation();
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Related entity:");
+            GUILayout.Label("Relation type:");
+            EditorGUILayout.EndHorizontal();
+
+            for (int i = 0; i < relEntityIndexes.Count; i++)
+            {
+                EditorGUILayout.BeginHorizontal();
+                relEntityIndexes[i] = EditorGUILayout.Popup(relEntityIndexes[i], typesForRelations);
+                relTypeIndexes[i] = EditorGUILayout.Popup(relTypeIndexes[i], relTypes);
+
+                if (GUILayout.Button("Remove")) RemoveRelation(i);
+                EditorGUILayout.EndHorizontal();
+            }
+        }
+        EditorGUILayout.Separator();
+        EditorGUILayout.Separator();
+
 
         GUILayout.Label("Data fields");
 
@@ -134,6 +175,7 @@ public class ObjectSchemeWindow : EditorWindow
         DataRegister.Prepare();
         initRegisteredSchemesCombo();
         initInheritanceCombo();
+        initRelationsCombos();
 
         schemeName = dataScheme.TypeName;
     }
@@ -150,6 +192,7 @@ public class ObjectSchemeWindow : EditorWindow
 
         initFields();
         initInheritanceCombo();
+        initRelationsCombos();
     }
 
     private void CreateScheme()
@@ -158,6 +201,7 @@ public class ObjectSchemeWindow : EditorWindow
 
         initFields();
         initInheritanceCombo();
+        initRelationsCombos();
 
         schemeName = dataScheme.TypeName = "<define scheme name>";
     }
@@ -173,14 +217,31 @@ public class ObjectSchemeWindow : EditorWindow
             throw new Exception("Not valid data scheme: " + message);
         }
 
+        dataScheme.Relations.Clear();
+        for (int i = 0; i < relEntityIndexes.Count; i++)
+        {
+            dataScheme.Relations.Add(
+                new Relation() 
+                { 
+                    RelationType = (RelationType)relTypeIndexes[i], 
+                    EntityName = typesForRelations[relEntityIndexes[i]] 
+                }
+            );
+        }
+
+        SchemeStorage.ProcessRelations(dataScheme);
+
         lastValidSchemeName = dataScheme.TypeName;
         dataScheme.RaiseChanged();
 
         if (!SchemeStorage.HasScheme(dataScheme.TypeName))
             SchemeStorage.AddScheme(dataScheme);
+        else
+            dataScheme.RaiseChanged();
 
         SchemeStorage.SaveAtProject();
 
+        initRegisteredSchemesCombo();
         initInheritanceCombo();
     }
 
@@ -191,6 +252,7 @@ public class ObjectSchemeWindow : EditorWindow
 
         initRegisteredSchemesCombo(true);
         initInheritanceCombo();
+        initRelationsCombos();
     }
 
     private void RemoveField(int index)
@@ -207,12 +269,12 @@ public class ObjectSchemeWindow : EditorWindow
         SchemeStorage.ReloadStorage();
         initRegisteredSchemesCombo();
         initInheritanceCombo();
-
-        Debug.Log(string.Format("reloaded", new object[] {   }));
+        initRelationsCombos();
     }
 
     private void GenerateAll()
     {
+        RepoSourceGenerator.GenerateRepoSources();
         EntitySourceGenerator.GenerateEntityBase();
 
         foreach (var scheme in SchemeStorage.AllSchemes)
@@ -223,6 +285,18 @@ public class ObjectSchemeWindow : EditorWindow
         AssetDatabase.Refresh();
         this.Close();
     } 
+
+    private void CreateNewRelation()
+    {
+        relEntityIndexes.Add(0);
+        relTypeIndexes.Add(0);
+    }
+
+    private void RemoveRelation(int index)
+    {
+        relEntityIndexes.RemoveAt(index);
+        relTypeIndexes.RemoveAt(index);
+    }
     #endregion
 
     #region gui helpers
@@ -268,9 +342,7 @@ public class ObjectSchemeWindow : EditorWindow
         }
     }
 
-    private int inhIndex;
-    private string[] registeredSchemes;
-    // инициализация комобобокса которыйпоказывает наследуюмую сущность по дефолту EntityBase
+    // инициализация комобобокса который показывает наследуюмую сущность по дефолту EntityBase
     private void initInheritanceCombo()
     {
         var tempList = new List<string>();
@@ -280,6 +352,23 @@ public class ObjectSchemeWindow : EditorWindow
 
         registeredSchemes = tempList.ToArray();
         inhIndex = Array.IndexOf<string>(registeredSchemes, dataScheme.InheritanceType);
+    }
+
+    private void initRelationsCombos()
+    {
+        relEntityIndexes.Clear();
+        relTypeIndexes.Clear();
+
+        var tempTypeList = new List<string>(SchemeStorage.GetAllRegisteredSchemes());
+        var tempArr = tempTypeList.ToArray();
+
+        foreach (var r in dataScheme.Relations)
+        {
+            relEntityIndexes.Add(Array.IndexOf<string>(tempArr, r.EntityName));
+            relTypeIndexes.Add((int)r.RelationType);
+        }
+
+        typesForRelations = tempArr;
     }
     #endregion
 }

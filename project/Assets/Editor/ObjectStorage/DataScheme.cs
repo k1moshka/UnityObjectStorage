@@ -22,11 +22,19 @@ namespace UnityStaticData
         [field: NonSerialized]
         public event Action<string, string> OnRenameScheme;
 
+        /// <summary>
+        /// Ключ главного поля которое используется в методе ToString()
+        /// </summary>
+        public string MainFieldKey { get; set; }
         // <fieldKey, field>
         /// <summary>
         /// Все поля схемы, (fieldKey, field)
         /// </summary>
         public Dictionary<string, Field> Fields { get; set; }
+        /// <summary>
+        /// Связанные сущности
+        /// </summary>
+        public List<Relation> Relations { get; set; }
         /// <summary>
         /// Тип генерируемых сущностей
         /// </summary>
@@ -45,10 +53,13 @@ namespace UnityStaticData
         /// Сгенерирована ли сущность для схемы
         /// </summary>
         public bool IsGenerated { get { return System.IO.File.Exists(EntitySourceGenerator.GetSourcePath(TypeName)); } }
+        
+        // TODO: проверить изменение наследуемого типа
+        private string inheritanceType;
         /// <summary>
-        /// Насоелуемый тип, по дефолту EntityBase
+        /// Наследуемый тип, по дефолту EntityBase
         /// </summary>
-        public string InheritanceType { get; set; }
+        public string InheritanceType { get { return inheritanceType; } set { inheritanceType = value; RaiseChanged(); } }
 
         /// <summary>
         /// Создание нового экземпляра
@@ -56,7 +67,8 @@ namespace UnityStaticData
         public DataScheme()
         {
             Fields = new Dictionary<string, Field>();
-            InheritanceType = "EntityBase";
+            Relations = new List<Relation>();
+            inheritanceType = "EntityBase";
         }
         /// <summary>
         /// Добавление нового поля в схему данных. Возвращает ключ для нового поля.
@@ -121,6 +133,19 @@ namespace UnityStaticData
             }
 
             return true;
+        }
+        /// <summary>
+        /// Установка поля значение которого будет выводиться при методе ToString на инстансе и в генерируемом коде
+        /// </summary>
+        /// <param name="fieldName"></param>
+        public void SetMainField(string fieldName)
+        {
+            var fieldKey = (from f in Fields
+                            where f.Value.Name == fieldName
+                            select f.Key).FirstOrDefault();
+
+            if (string.IsNullOrEmpty(fieldKey))
+                MainFieldKey = fieldKey;
         }
         /// <summary>
         /// Очистка всех обрабочиков событий для схемы

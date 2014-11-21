@@ -59,6 +59,9 @@ namespace UnityStaticData
 
             var refferenceKey = SchemeStorage.GetSchemeKey(dataSchemeName);
 
+            if (refferenceKey == null)
+                return new Instance[0];
+
             if (!DataRegister.instances.ContainsKey(refferenceKey))
                 instances[refferenceKey] = new Instance[0];
 
@@ -74,6 +77,10 @@ namespace UnityStaticData
             var refferenceKey = SchemeStorage.GetSchemeKey(dataSchemeName);
 
             instances[refferenceKey] = instancesToSave;
+            foreach (var i in instancesToSave)
+            {
+                i.SaveRelations();
+            }
         }
         /// <summary>
         /// Удаление инстансов для схемы данных
@@ -110,7 +117,7 @@ namespace UnityStaticData
             }
             else
             {
-                RemoveInstances(args.SchemeName);
+                SyncSchemeInstances(args.SchemeName);
             }
         }  
     }

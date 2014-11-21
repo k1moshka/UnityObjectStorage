@@ -20,6 +20,7 @@ public class SettingsWindow : EditorWindow
 
         Settings.Instance.PathToSaveData = EditorGUILayout.TextField("Path to save plugin data", Settings.Instance.PathToSaveData);
         Settings.Instance.PathToSaveSources = EditorGUILayout.TextField("Path to save generated sources", Settings.Instance.PathToSaveSources);
+        Settings.Instance.ResourcesFileName = EditorGUILayout.TextField("Name of resources file for repository", Settings.Instance.ResourcesFileName);
 
         GUILayout.Label("Registered types:");
 

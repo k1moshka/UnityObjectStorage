@@ -18,7 +18,10 @@ namespace UnityStaticData
         /// <param name="data">Данные для сохранения</param>
         public string GenerateEntity(DataScheme scheme)
         {
-            builder.Remove(0, builder.Length); // clear builder
+            builder.Remove(0, builder.Length);  // clear builder
+
+            if (scheme.Relations.Count > 0)
+                builder.Append("using System.Collections.Generic;\r\nusing System.Linq;\r\n");
 
             builder.Append("using System;\r\n\r\n");
             builder.Append("[Serializable]\r\n");
@@ -28,18 +31,90 @@ namespace UnityStaticData
             builder.Append(scheme.TypeName);
             builder.Append(" : ");
             builder.Append(scheme.InheritanceType);
-            builder.Append("\r\n{\r\n"); // begin class bracket
+            builder.Append("\r\n{\r\n");        // begin class bracket
 
-            foreach (var kv in scheme.Fields) // render properties
+            foreach (var kv in scheme.Fields)   // render properties
             {
                 builder.Append("    public ");
                 builder.Append(kv.Value.Type.TypeName); 
                 builder.Append(" ");
                 builder.Append(kv.Value.Name);
                 builder.Append(" { get; set; }\r\n");
-            }
+            }                                   // end render properties
 
-            builder.Append(@"}"); // end class bracket
+            foreach (var r in scheme.Relations) // render relations
+            {
+                
+                switch (r.RelationType)
+                {
+                    case RelationType.OneToMany:   
+                        var privateFieldName = RepoSourceGenerator.GetNameForPrivateField(r.EntityName, true);
+                        var indexesName = RepoSourceGenerator.GetNameForIndexes(r.EntityName, true);
+
+
+                        builder.Append("    private int[] ");   // begin indexes
+                        builder.Append(indexesName);
+                        builder.Append(";\r\n");                // end indexes
+                        builder.Append("    private List<");    // brgin private field
+                        builder.Append(r.EntityName);
+                        builder.Append("> ");
+                        builder.Append(privateFieldName);
+                        builder.Append(";\r\n");                // end private field
+                        builder.Append("    public List<");     // begin property
+                        builder.Append(r.EntityName);
+                        builder.Append("> ");
+                        builder.Append(r.EntityName);
+                        builder.Append("s { get { if (");       // begin get and if
+                        builder.Append(privateFieldName);
+                        builder.Append(" == null) ");           // end if
+                        builder.Append(privateFieldName);       // begin initialization
+                        builder.Append(" = new List<"); 
+                        builder.Append(r.EntityName);
+                        builder.Append(">(Repository.GetSet<");
+                        builder.Append(r.EntityName);
+                        builder.Append(">(a => ");
+                        builder.Append(indexesName);
+                        builder.Append(".Contains(a.Id)));");   // end init
+                        builder.Append(" return ");
+                        builder.Append(privateFieldName);       // return value
+                        builder.Append("; } }\r\n");            // end property
+                        break;
+                    case RelationType.OneToOne:
+                    case RelationType.ManyToOne:
+                        var privateField = RepoSourceGenerator.GetNameForPrivateField(r.EntityName, true);
+                        var idName = RepoSourceGenerator.GetNameForIndexes(r.EntityName, true);
+
+                        builder.Append("    private int ");
+                        builder.Append(idName);
+                        builder.Append(";\r\n");
+                        builder.Append("    private ");
+                        builder.Append(r.EntityName);
+                        builder.Append(" ");
+                        builder.Append(privateField);
+                        builder.Append(";\r\n");
+                        builder.Append("    public ");
+                        builder.Append(r.EntityName);
+                        builder.Append(" ");
+                        builder.Append(r.EntityName);
+                        builder.Append(" { get { if (");    // begin get and if
+                        builder.Append(privateField);
+                        builder.Append(" == null) ");       // end if
+                        builder.Append(privateField);       // begin initialization
+                        builder.Append(" = Repository.Get<");
+                        builder.Append(r.EntityName);
+                        builder.Append(">(a => ");
+                        builder.Append("a.Id == ");
+                        builder.Append(idName);
+                        builder.Append("); return ");       // end init
+                        builder.Append(privateField);       // return value
+                        builder.Append("; } }\r\n");  
+                        break;
+                    default:
+                        break;
+                }
+            }                                // end render relations
+
+            builder.Append(@"}");            // end class bracket
 
             return builder.ToString();
         }
@@ -59,7 +134,7 @@ namespace UnityStaticData
             builder.Remove(0, builder.Length);
 
             builder.Append(string.Format("using System;\r\n[Serializable]\r\npublic {0} EntityBase", "class"));
-            builder.Append("\r\n{\r\n\tpublic int Index;\r\n}");
+            builder.Append("\r\n{\r\n\tpublic int Id { get; set; }\r\n}");
             return builder.ToString();
         }
     }

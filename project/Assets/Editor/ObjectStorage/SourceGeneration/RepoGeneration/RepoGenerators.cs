@@ -51,6 +51,21 @@ public static class Repository
         var targetRepo = rawRepos[key] as T[];
         return targetRepo.FirstOrDefault(predicate);
     {1}
+
+    public static T[] GetAll<T>() where T : EntityBase
+    {0}
+        var key = typeof(T).ToString();
+
+        return rawRepos[key] as T[];
+    {1}
+
+    public static T[] GetSet<T>(Func<T, bool> predicate) where T : EntityBase
+    {0}
+        var key = typeof(T).ToString();
+
+        var targetRepo = rawRepos[key] as T[];
+        return targetRepo.Where(predicate).ToArray();
+    {1}
 {1}";
 
                 return string.Format(source, '{', '}', pathToResources);
