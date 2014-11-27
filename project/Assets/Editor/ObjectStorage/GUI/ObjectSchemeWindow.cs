@@ -40,7 +40,7 @@ public class ObjectSchemeWindow : EditorWindow
     private List<int> relEntityIndexes = new List<int>();
     private List<int> relTypeIndexes = new List<int>();
     private string[] typesForRelations;
-    private string[] relTypes = new string[] { "1:m", "1:1", "m:1", };
+    private string[] relTypes = new string[] { "One", "Many", };
 
     // gui render
     public void OnGUI()
@@ -110,6 +110,7 @@ public class ObjectSchemeWindow : EditorWindow
 
             var key = dataScheme.AddField(new Field() { Type = Settings.GetDescriptor(availableTypes[0]) });
             fieldKeys.Add(key);
+            advancedOptionFolds.Add(false);
         }
 
         for (int i = 0; i < fieldsCount; i++) // begin fields render
@@ -138,8 +139,13 @@ public class ObjectSchemeWindow : EditorWindow
             var lastSelectedType = selectsType[i];
             selectsType[i] = EditorGUILayout.Popup("Field Type:", selectsType[i], availableTypes);
             if (lastSelectedType != selectsType[i])
-                field.Type = Settings.GetDescriptor(availableTypes[selectsType[i]]);   
+                field.Type = Settings.GetDescriptor(availableTypes[selectsType[i]]);
 
+            advancedOptionFolds[i] = EditorGUILayout.Foldout(advancedOptionFolds[i], "Field settings");
+            if (advancedOptionFolds[i])
+            {
+                field.IncludedInToString = EditorGUILayout.Toggle("Include in ToString()", field.IncludedInToString);
+            }
             EditorGUILayout.EndVertical();
 
             if (GUILayout.Button("Remove")) RemoveField(i);
@@ -161,7 +167,7 @@ public class ObjectSchemeWindow : EditorWindow
         GUILayout.EndVertical();
         EditorGUILayout.EndScrollView();
     }
-
+    private List<bool> advancedOptionFolds = new List<bool>();
     [MenuItem("Assets/Create new object storage...")]
     public static void ShowWindow()
     {
@@ -228,8 +234,6 @@ public class ObjectSchemeWindow : EditorWindow
                 }
             );
         }
-
-        SchemeStorage.ProcessRelations(dataScheme);
 
         lastValidSchemeName = dataScheme.TypeName;
         dataScheme.RaiseChanged();
@@ -313,6 +317,8 @@ public class ObjectSchemeWindow : EditorWindow
         {
             selectsType.Add(Array.IndexOf<string>(availableTypes, t.Type.ToString()));
         }
+        advancedOptionFolds.Clear();
+        advancedOptionFolds.AddRange(new bool[dataScheme.Fields.Count]);
     }
 
     private void initRegisteredSchemesCombo(bool isLoadFromStorage = true)

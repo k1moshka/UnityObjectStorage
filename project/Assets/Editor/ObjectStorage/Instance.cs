@@ -79,7 +79,7 @@ namespace UnityStaticData
 
                     var canAddNew = false;
 
-                    if (DataScheme.Relations[i].RelationType == RelationType.OneToMany)
+                    if (DataScheme.Relations[i].RelationType == RelationType.Many)
                     {
                         for ( var j = 0; j < indexes[i].Count; j++ )
                         {

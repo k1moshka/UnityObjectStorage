@@ -8,15 +8,11 @@
         /// <summary>
         /// Один ко многим
         /// </summary>
-        OneToMany = 0,
+        One = 0,
         /// <summary>
         /// Один к одному
         /// </summary>
-        OneToOne = 1,
-        /// <summary>
-        /// Много к одному
-        /// </summary>
-        ManyToOne = 2,
+        Many = 1,
     }
 
     /// <summary>

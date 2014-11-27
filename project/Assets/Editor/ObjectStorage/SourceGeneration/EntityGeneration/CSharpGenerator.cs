@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -10,6 +11,7 @@ namespace UnityStaticData
     public class CSharpGenerator : IEntityGenerator
     {
         private StringBuilder builder = new StringBuilder();
+        private List<string> toStringProps = new List<string>();
 
         /// <summary>
         /// Генерирование класса или структуры согласно схеме, возвращает c# код
@@ -18,6 +20,7 @@ namespace UnityStaticData
         /// <param name="data">Данные для сохранения</param>
         public string GenerateEntity(DataScheme scheme)
         {
+            toStringProps.Clear();
             builder.Remove(0, builder.Length);  // clear builder
 
             if (scheme.Relations.Count > 0)
@@ -40,6 +43,9 @@ namespace UnityStaticData
                 builder.Append(" ");
                 builder.Append(kv.Value.Name);
                 builder.Append(" { get; set; }\r\n");
+
+                if (kv.Value.IncludedInToString)
+                    toStringProps.Add(kv.Value.Name);
             }                                   // end render properties
 
             foreach (var r in scheme.Relations) // render relations
@@ -47,7 +53,7 @@ namespace UnityStaticData
                 
                 switch (r.RelationType)
                 {
-                    case RelationType.OneToMany:   
+                    case RelationType.Many:   
                         var privateFieldName = RepoSourceGenerator.GetNameForPrivateField(r.EntityName, true);
                         var indexesName = RepoSourceGenerator.GetNameForIndexes(r.EntityName, true);
 
@@ -79,8 +85,7 @@ namespace UnityStaticData
                         builder.Append(privateFieldName);       // return value
                         builder.Append("; } }\r\n");            // end property
                         break;
-                    case RelationType.OneToOne:
-                    case RelationType.ManyToOne:
+                    case RelationType.One:
                         var privateField = RepoSourceGenerator.GetNameForPrivateField(r.EntityName, true);
                         var idName = RepoSourceGenerator.GetNameForIndexes(r.EntityName, true);
 
@@ -113,6 +118,25 @@ namespace UnityStaticData
                         break;
                 }
             }                                // end render relations
+
+            // render ToString() method
+            if (toStringProps.Count > 0)
+            {
+                builder.Append("\r\n\r\n    public override string ToString()\r\n    {\r\n        return \"");
+                builder.Append(scheme.TypeName);
+                builder.Append(" (\"");
+                foreach (var p in toStringProps)
+                {
+                    builder.Append(" + \"");
+                    builder.Append(p);
+                    builder.Append("->\" + ");
+                    builder.Append(p);
+                    builder.Append(".ToString() + \";\"");
+                }
+
+                builder.Append(" + \")\";\r\n    }\r\n");
+            }
+
 
             builder.Append(@"}");            // end class bracket
 

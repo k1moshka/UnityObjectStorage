@@ -169,17 +169,18 @@ namespace UnityStaticData
 
         private static RelationType mirrorType(RelationType targetType)
         {
-            switch (targetType)
-            {
-                case RelationType.OneToMany:
-                    return RelationType.ManyToOne;
-                case RelationType.OneToOne:
-                    return RelationType.OneToOne;
-                case RelationType.ManyToOne:
-                    return RelationType.OneToMany;
-                default:
-                    throw new ArgumentException("Argument is not valid relation type. Argument value: " + (int)targetType);
-            }
+            //switch (targetType)
+            //{
+            //    case RelationType.Many:
+            //        return RelationType.Many;
+            //    case RelationType.OneToOne:
+            //        return RelationType.OneToOne;
+            //    case RelationType.ManyToOne:
+            //        return RelationType.Many;
+            //    default:
+            //        throw new ArgumentException("Argument is not valid relation type. Argument value: " + (int)targetType);
+            //}
+            return RelationType.Many;
         }
 
         public class SchemeChangedEventArgs

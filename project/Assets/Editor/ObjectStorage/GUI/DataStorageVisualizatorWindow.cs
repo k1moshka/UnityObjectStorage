@@ -49,7 +49,7 @@ public class DataStorageVisualizatorWindow : EditorWindow
         var removeIndex = -1;
         foreach (var i in instances)
         {
-            instanceFolds[index] = EditorGUILayout.Foldout(instanceFolds[index], "Instance");
+            instanceFolds[index] = EditorGUILayout.Foldout(instanceFolds[index], i.ToString());
             if (instanceFolds[index])
             {
                 i.RenderFields(); // render all fields of instance

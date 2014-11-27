@@ -22,6 +22,10 @@ namespace UnityStaticData
         /// Тип поля
         /// </summary>
         public TypeDescriptor Type { get; set; }
+        /// <summary>
+        /// Показывает включено ли поле для строкового представления объекта
+        /// </summary>
+        public bool IncludedInToString { get; set; }
 
         // для десериализации
         public Field()

@@ -82,9 +82,9 @@ namespace UnityStaticData
                                          where __relationType.EntityName == relationType
                                          select __relationType.RelationType).FirstOrDefault();
 
-                            var indexesFieldName = RepoSourceGenerator.GetNameForIndexes(relationType, rType == RelationType.OneToMany);
+                            var indexesFieldName = RepoSourceGenerator.GetNameForIndexes(relationType, rType == RelationType.Many);
 
-                            if ((rType == RelationType.ManyToOne || rType == RelationType.OneToOne) && kv.Value != null)
+                            if ((rType == RelationType.One) && kv.Value != null)
                             {
                                 t
                                     .GetField(indexesFieldName, BindingFlags.NonPublic | BindingFlags.Instance)
