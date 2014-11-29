@@ -150,6 +150,7 @@ public class DataStorageVisualizatorWindow : EditorWindow
         DataRegister.Save();
     }
     #endregion
+
 //////////////////////////////////////////////////////////////////////////////////////////////
     #region gui helpers
     private Vector2 scrollPos;
