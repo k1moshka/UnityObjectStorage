@@ -20,6 +20,12 @@ public class DataStorageVisualizatorWindow : EditorWindow
 
     public void OnGUI()
     {
+        if (dataScheme == null)
+        {
+            GUILayout.Label("No one data scheme loaded.");
+            return;
+        }
+
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
         EditorGUILayout.BeginVertical();
 
@@ -135,6 +141,9 @@ public class DataStorageVisualizatorWindow : EditorWindow
 
     public void OnDestroy()
     {
+        if (dataScheme == null)
+            return;
+
         dataScheme.OnFieldsChanged -= dataScheme_OnChanged;
         SchemeStorage.OnSchemesChanged -= SchemeStorage_OnSchemesChanged;
 
@@ -194,6 +203,9 @@ public class DataStorageVisualizatorWindow : EditorWindow
     private string[][] potentialRelations;
     private void loadPotentialRelations()
     {
+        if (dataScheme == null)
+            return;
+
         var tempList = new List<string[]>();
         foreach (var r in dataScheme.Relations)
         {
