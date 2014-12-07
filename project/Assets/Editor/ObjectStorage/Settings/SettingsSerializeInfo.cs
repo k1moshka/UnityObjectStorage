@@ -15,7 +15,7 @@ namespace UnityStaticData
         private const string DEFAULT_PATH = "Assets/DataLayer/";
         private const string SETTING_PATH = "Assets/Editor/UnityStaticData/s.set";
         private const string SOURCES_PATH = "Assets/Scripts/Data";
-        private const string RESOURCES_FILE_NAME = "dataLayerResources.bin";
+        private const string RESOURCES_FILE_NAME = "dataLayerResources";
         private const string RESOURCES_PATH = "Assets/Resources/";
 
         /// <summary>
@@ -30,6 +30,10 @@ namespace UnityStaticData
         /// Имя файла ресурсов репозитория
         /// </summary>
         public string ResourcesFileName { get; set; }
+        /// <summary>
+        /// Типы которые не сериализуются в хранилище, а загружаются из ресурсов проекта
+        /// </summary>
+        public string[] LinkedTypes { get; set; }
 
         private List<TypeDescriptor> types = new List<TypeDescriptor>();
         // Записывается только один раз на загрузке настроек, при дессериализации ли создании новых настроек
@@ -50,14 +54,17 @@ namespace UnityStaticData
                     new TypeDescriptor() { TypeName = "System.Single", ToStringValue = "float", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderFloat" }, 
                     new TypeDescriptor() { TypeName = "System.Double",  RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderFloat" }, 
                     new TypeDescriptor() { TypeName = "System.Decimal", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderDecimal" }, 
-                    new TypeDescriptor() { TypeName = "UnityEngine.Vector2", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderVector2" }, 
-                    new TypeDescriptor() { TypeName = "UnityEngine.Vector3", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderVector3" }, 
-                    new TypeDescriptor() { TypeName = "UnityEngine.Vector4", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderVector4" }, 
-                    new TypeDescriptor() { TypeName = "UnityEngine.Quaternion", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderQuaternion" },
-                    // TODO: добавить спрайты, цвет, префабы
                     new TypeDescriptor() { TypeName = "UnityEngine.Sprite", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderSprite" }, 
+                    new TypeDescriptor() { TypeName = "UnityEngine.Object", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderUnityObject" }, 
+                    new TypeDescriptor() { TypeName = "UnityEngine.AudioClip", RenderMethodType = "UnityStaticData.RenderMethods", RenderMethodName = "RenderAudio" },
                 }
             );
+            LinkedTypes = new string[]
+            {
+                "UnityEngine.Sprite",
+                "UnityEngine.Object",
+                "UnityEngine.AudioClip",
+            };
         }
 
         #region ctors

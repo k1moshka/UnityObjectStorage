@@ -46,6 +46,7 @@ public class SettingsWindow : EditorWindow
     }
 
     [MenuItem("Edit/USD Settings...")]
+    [MenuItem("USD/USD Settings...")]
     public static void ShowWindow()
     {
         EditorWindow.GetWindow<SettingsWindow>().title = "USD Settings";

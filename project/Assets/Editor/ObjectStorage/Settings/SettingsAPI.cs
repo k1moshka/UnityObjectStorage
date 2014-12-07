@@ -51,7 +51,7 @@ namespace UnityStaticData
         /// <returns></returns>
         public static string GetPathToSaveResources()
         {
-            return RESOURCES_PATH + Instance.ResourcesFileName;
+            return RESOURCES_PATH + Instance.ResourcesFileName + ".txt";
         }
         /// <summary>
         /// Получение всех зарегистрированных типов в виде массива строк
@@ -74,6 +74,14 @@ namespace UnityStaticData
         public static TypeDescriptor GetDescriptor(string toStringValue)
         {
             return Instance.types.First(t => t.ToStringValue == toStringValue || t.TypeName.Contains(toStringValue));
+        }
+        /// <summary>
+        /// Возвращает несериализуемые типы
+        /// </summary>
+        /// <returns></returns>
+        public static string[] GetLinkedTypes()
+        {
+            return Instance.LinkedTypes;
         }
         /// <summary>
         /// Сохранение настроек

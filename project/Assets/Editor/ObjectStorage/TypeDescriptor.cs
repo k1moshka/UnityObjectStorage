@@ -18,6 +18,7 @@ namespace UnityStaticData
         /// Значение которое отображается в комбобоксах, если null то берется 
         /// </summary>
         public string ToStringValue { get; set; }
+
         /// <summary>
         /// Получение описываемого типа как Type
         /// </summary>

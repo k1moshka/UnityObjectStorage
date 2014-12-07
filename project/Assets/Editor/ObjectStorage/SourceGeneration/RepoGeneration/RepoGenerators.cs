@@ -30,7 +30,9 @@ public static class Repository
     
     static Repository()
     {0}
-        using (var stream = System.IO.File.OpenRead(""{2}""))
+        var asset = UnityEngine.Resources.Load<UnityEngine.TextAsset>(""{2}"");
+
+        using (var stream = new System.IO.MemoryStream(asset.bytes))
         {0}
             var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
             rawRepos = (Dictionary<string, object>)formatter.Deserialize(stream);
@@ -67,8 +69,9 @@ public static class Repository
         return targetRepo.Where(predicate).ToArray();
     {1}
 {1}";
+                
 
-                return string.Format(source, '{', '}', pathToResources);
+                return string.Format(source, '{', '}', USDUtil.GetLocalizedPath(pathToResources));
             }
         }
         /// <summary>

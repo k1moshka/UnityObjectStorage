@@ -39,27 +39,5 @@ namespace UnityStaticData
             using (var writer = File.CreateText(repoSourcePath))
                 writer.Write(repoSource);
         }
-        /// <summary>
-        /// Возвращает имя для поля класса которое предоставляет связанные индексы
-        /// </summary>
-        /// <param name="entityName">Имя сущности поля</param>
-        /// <param name="isMany">Показывает список сущностей или одна сущность хранится в поле</param>
-        /// <returns></returns>
-        public static string GetNameForIndexes(string entityName, bool isMany)
-        {
-            return GetNameForPrivateField(entityName, isMany) + "Indexes";
-        }
-        /// <summary>
-        /// Возвращает имя поля класса которое предоставляет сущности
-        /// </summary>
-        /// <param name="entityName">Имя сущности поля</param>
-        /// <param name="isMany">Показывает список сущностей или одна сущность хранится в поле</param>
-        /// <returns></returns>
-        public static string GetNameForPrivateField(string entityName, bool isMany = false)
-        {
-            var result = "_" + entityName.ToLower();
-            
-            return isMany ? result + "s" : result;
-        }
     }
 }

@@ -11,8 +11,8 @@ using System.IO;
 /// </summary>
 public class DataStorageVisualizatorWindow : EditorWindow
 {
-    [MenuItem("Assets/Manage Storage...")]
-    [ContextMenu("Manage Storage...")]
+    [MenuItem("Assets/USD/Manage Storage...")]
+    [MenuItem("USD/Manage Storage...", false, 1)]
     public static void ShowWindow()
     {
         EditorWindow.GetWindow(typeof(DataStorageVisualizatorWindow));

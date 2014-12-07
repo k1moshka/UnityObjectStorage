@@ -168,7 +168,9 @@ public class ObjectSchemeWindow : EditorWindow
         EditorGUILayout.EndScrollView();
     }
     private List<bool> advancedOptionFolds = new List<bool>();
-    [MenuItem("Assets/Create new object storage...")]
+    
+    [MenuItem("USD/Create new object storage...", false, 1)]
+    [MenuItem("Assets/USD/Create new object storage...")]
     public static void ShowWindow()
     {
         var window = CreateInstance<ObjectSchemeWindow>();

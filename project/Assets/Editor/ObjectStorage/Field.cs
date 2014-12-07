@@ -39,11 +39,20 @@ namespace UnityStaticData
 
             var type = this.Type.GetType();
 
-            if (type == null)
+            if (type == null) // если нулл то это тип сборки юнити
             {
+                if (LinkedObject.IsLinkedObject(this.Type.TypeName)) // если объект не сериализуется то он загружается из ресурсов в рантайм
+                {
+                    type = typeof(LinkedObject);
+                    Value = new LinkedObject();
+
+                    return;
+                }
+
                 var assembly = Assembly.GetAssembly(typeof(Vector2));
                 type = assembly.GetType(typeDescr.TypeName);
             }
+
 
             if (type.IsClass)
                 Value = null;

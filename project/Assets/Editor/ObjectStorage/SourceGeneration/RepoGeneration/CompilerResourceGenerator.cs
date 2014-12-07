@@ -8,6 +8,7 @@ using System.Reflection;
 using System.IO;
 
 using UnityEngine;
+using UnityEditor;
 
 namespace UnityStaticData
 {
@@ -24,21 +25,8 @@ namespace UnityStaticData
         /// <param name="schemes">Схемы инстансы которых необходимо сохранить в ресурсах</param>
         public void GenerateResourceRepository(string path, string pathToAssembly, DataScheme[] schemes)
         {
-            var fullSource = new StringBuilder("using System;using UnityEngine;");
-            fullSource.Append(removeUsings(EntitySourceGenerator.GetGeneratedSource("EntityBase")));
-            foreach (var s in schemes)
-            {
-                var source = EntitySourceGenerator.GetGeneratedSource(s.TypeName);
-
-                if (source != null)
-                {
-                    fullSource.Append(
-                        removeUsings(source)
-                    );
-                }
-                else
-                    throw new InvalidOperationException("Entity sources must be generated before generate resources :(");
-            }
+            if (EntitySourceGenerator.GetGeneratedSource("EntityBase") == null)
+                throw new InvalidOperationException("Entity sources must be generated before generate resources :(");
 
             var allTypes = Assembly.LoadFile(pathToAssembly).GetTypes();
 
@@ -68,9 +56,21 @@ namespace UnityStaticData
                     // TODO: добавить проверку не только свойст но и полей (advanced)
                     foreach (var f in i.FieldsValues)
                     {
-                        t
-                            .GetProperty(f.Value.Name)
-                            .SetValue(newObj, f.Value.Value, null);
+                        if (LinkedObject.IsLinkedObject(f.Value.Type.TypeName))
+                        {
+                            Debug.Log(string.Format("typename:{0}", new object[] { f.Value.Type.TypeName }));
+                            // TODO: сохранить как строку
+                            // TODO: переделать генерацию сурсов сущностей, чтобы свойства создавались но не сериализовались, сериализовался только путь до объекта
+                            var sprite = f.Value.Value as LinkedObject;
+
+                            t
+                                .GetField(USDUtil.GetLinkName(f.Value.Name), BindingFlags.Instance | BindingFlags.NonPublic)
+                                .SetValue(newObj, USDUtil.GetLocalizedPath(sprite.Link));
+                        }
+                        else
+                            t
+                                .GetProperty(f.Value.Name)
+                                .SetValue(newObj, f.Value.Value, null);
                     }
 
                     foreach (var kv in i.Relations)
@@ -82,7 +82,7 @@ namespace UnityStaticData
                                          where __relationType.EntityName == relationType
                                          select __relationType.RelationType).FirstOrDefault();
 
-                            var indexesFieldName = RepoSourceGenerator.GetNameForIndexes(relationType, rType == RelationType.Many);
+                            var indexesFieldName = USDUtil.GetNameForIndexes(relationType, rType == RelationType.Many);
 
                             if ((rType == RelationType.One) && kv.Value != null)
                             {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using UnityEngine;
 
 namespace UnityStaticData
 {
@@ -38,6 +39,43 @@ namespace UnityStaticData
 
             foreach (var kv in scheme.Fields)   // render properties
             {
+                if (LinkedObject.IsLinkedObject(kv.Value.Type.TypeName))
+                {
+                    var privateName = USDUtil.GetNameForPrivateField(kv.Value.Name);
+                    var linkName = USDUtil.GetLinkName(kv.Value.Name);
+
+                    builder.Append("    private string ");
+                    builder.Append(linkName);
+                    builder.Append(";\r\n");
+
+                    builder.Append("    [field: NonSerialized]\r\n");
+                    builder.Append("    private ");
+                    builder.Append(kv.Value.Type.TypeName);
+                    builder.Append(" ");
+                    builder.Append(privateName);
+                    builder.Append(";\r\n");
+
+                    builder.Append("    public ");
+                    builder.Append(kv.Value.Type.TypeName);
+                    builder.Append(" ");
+                    builder.Append(kv.Value.Name);
+                    builder.Append(" { get { if (");
+                    builder.Append(privateName);
+                    builder.Append(" == null) ");
+                    builder.Append(privateName);
+                    builder.Append(" = UnityEngine.Resources.Load<");
+                    builder.Append(kv.Value.Type.TypeName);
+                    builder.Append(@">(");
+                    builder.Append(linkName);
+                    builder.Append("); return ");
+                    builder.Append(privateName);
+                    builder.Append("; } set { ");
+                    builder.Append(privateName);
+                    builder.Append(" = value; } }\r\n");
+
+                    continue;
+                }
+
                 builder.Append("    public ");
                 builder.Append(kv.Value.Type.TypeName); 
                 builder.Append(" ");
@@ -53,9 +91,9 @@ namespace UnityStaticData
                 
                 switch (r.RelationType)
                 {
-                    case RelationType.Many:   
-                        var privateFieldName = RepoSourceGenerator.GetNameForPrivateField(r.EntityName, true);
-                        var indexesName = RepoSourceGenerator.GetNameForIndexes(r.EntityName, true);
+                    case RelationType.Many:
+                        var privateFieldName = USDUtil.GetNameForPrivateField(r.EntityName, true);
+                        var indexesName = USDUtil.GetNameForIndexes(r.EntityName, true);
 
 
                         builder.Append("    private int[] ");   // begin indexes
@@ -86,8 +124,8 @@ namespace UnityStaticData
                         builder.Append("; } }\r\n");            // end property
                         break;
                     case RelationType.One:
-                        var privateField = RepoSourceGenerator.GetNameForPrivateField(r.EntityName, true);
-                        var idName = RepoSourceGenerator.GetNameForIndexes(r.EntityName, true);
+                        var privateField = USDUtil.GetNameForPrivateField(r.EntityName, true);
+                        var idName = USDUtil.GetNameForIndexes(r.EntityName, true);
 
                         builder.Append("    private int ");
                         builder.Append(idName);
